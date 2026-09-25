@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "gsmultiplayer",
+  "version": "${version}",
+  "name": "GS Multiplayer",
+  "description": "Play your singleplayer Minecraft world with friends over the internet. P2P first, relay fallback, no dedicated server required. Max 4 players.",
+  "authors": [
+    "GS Multiplayer Team"
+  ],
+  "contact": {
+    "homepage": "https://github.com/your-username/GS-Multiplayer",
+    "sources": "https://github.com/your-username/GS-Multiplayer",
+    "issues": "https://github.com/your-username/GS-Multiplayer/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/gsmultiplayer/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.gsmultiplayer.client.GsMultiplayerClient"
+    ]
+  },
+  "mixins": [
+    "gsmultiplayer.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "minecraft": "1.16.5",
+    "java": ">=1.8"
+  }
+}

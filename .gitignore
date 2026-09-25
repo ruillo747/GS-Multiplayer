@@ -1,0 +1,24 @@
+# gradle
+.gradle/
+build/
+
+# ide
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+
+# fabric
+run/
+
+# server
+server/node_modules/
+server/.env
+
+# local artifacts
+releases/
+*.log

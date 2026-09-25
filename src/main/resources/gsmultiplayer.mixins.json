@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "com.gsmultiplayer.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.8",
+  "mixins": [],
+  "client": [
+    "TitleScreenMixin",
+    "GameMenuScreenMixin",
+    "MinecraftClientMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "gsmultiplayer.refmap.json"
+}
