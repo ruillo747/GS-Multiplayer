@@ -45,10 +45,15 @@ public abstract class GsBaseScreen extends Screen {
         this.textRenderer.drawWithShadow(matrices, text, x, y, color);
     }
 
+    /** Vertical position of the screen title; compact screens may override. */
+    protected int titleY() {
+        return 14;
+    }
+
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.renderBackground(matrices);
-        drawCentered(matrices, this.title, this.width / 2, 14, 0xFFFFFF);
+        drawCentered(matrices, this.title, this.width / 2, titleY(), 0xFFFFFF);
         super.render(matrices, mouseX, mouseY, delta);
     }
 

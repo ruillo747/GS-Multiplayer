@@ -16,7 +16,7 @@ import com.gsmultiplayer.client.GsText;
 /** "Settings → Diagnostics": GS Multiplayer Log plus the developer-mode stats panel. */
 public final class DiagnosticsScreen extends GsBaseScreen {
 
-    private static final int LOG_LINES = 12;
+    private static final int LOG_LINES = 9;
 
     public DiagnosticsScreen(Screen parent) {
         super(GsText.t("gs.multiplayer.diagnostics_title"), parent);

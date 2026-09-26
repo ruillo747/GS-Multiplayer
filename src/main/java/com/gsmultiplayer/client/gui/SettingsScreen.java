@@ -22,7 +22,6 @@ public final class SettingsScreen extends GsBaseScreen {
     private CheckboxWidget devModeBox;
     private CheckboxWidget updatesBox;
     private CheckboxWidget titleButtonBox;
-    private CheckboxWidget pauseButtonBox;
 
     public SettingsScreen(Screen parent) {
         super(GsText.t("gs.multiplayer.settings_title"), parent);
@@ -52,19 +51,17 @@ public final class SettingsScreen extends GsBaseScreen {
         lanPortField.setText(String.valueOf(config.connection.lanPort));
         addButton(lanPortField);
 
-        devModeBox = addButton(new CheckboxWidget(cx - 100, y + 84, 200, 20,
+        // Compact column: the whole screen must fit 240 GUI units (scale-2 windowed mode).
+        devModeBox = addButton(new CheckboxWidget(cx - 100, y + 80, 200, 20,
                 GsText.t("gs.multiplayer.dev_mode"), config.diagnostics.devMode));
-        updatesBox = addButton(new CheckboxWidget(cx - 100, y + 108, 200, 20,
+        updatesBox = addButton(new CheckboxWidget(cx - 100, y + 102, 200, 20,
                 GsText.t("gs.multiplayer.update_check"), config.updates.enabled));
-        titleButtonBox = addButton(new CheckboxWidget(cx - 100, y + 132, 200, 20,
+        titleButtonBox = addButton(new CheckboxWidget(cx - 100, y + 124, 200, 20,
                 GsText.t("gs.multiplayer.title_button"), config.ui.showTitleButton));
-        pauseButtonBox = addButton(new CheckboxWidget(cx - 100, y + 156, 200, 20,
-                GsText.t("gs.multiplayer.pause_button"), config.ui.showPauseButton));
 
-        addButton(new ButtonWidget(cx - 100, this.height - 54, 200, 20,
+        addButton(new ButtonWidget(cx - 100, y + 150, 200, 20,
                 GsText.t("gs.multiplayer.save"), b -> save()));
-        addButton(new ButtonWidget(cx - 100, this.height - 30, 200, 20,
-                GsText.t("gui.back"), b -> onClose()));
+        // Esc closes the screen without saving - no extra Back button needed.
     }
 
     private TextFieldWidget addField(int cx, int y, String value, int maxLength, String key) {
@@ -90,7 +87,6 @@ public final class SettingsScreen extends GsBaseScreen {
         config.diagnostics.devMode = devModeBox.isChecked();
         config.updates.enabled = updatesBox.isChecked();
         config.ui.showTitleButton = titleButtonBox.isChecked();
-        config.ui.showPauseButton = pauseButtonBox.isChecked();
         ConfigManager.save();
         mod().applySettings();
         if (!previousUrl.equals(config.signalingUrl)) {
@@ -121,8 +117,10 @@ public final class SettingsScreen extends GsBaseScreen {
         label(matrices, cx - 100, y + 41, "gs.multiplayer.relay_host");
         label(matrices, cx + 104, y + 41, "gs.multiplayer.relay_port");
         label(matrices, cx + 104, y + 67, "gs.multiplayer.lan_port");
+        drawLeft(matrices, GsText.t("gs.multiplayer.esc_hint").getString(),
+                cx - 100, y + 174, 0x606080);
         drawCentered(matrices, GsText.t("gs.multiplayer.your_id",
-                ConfigManager.get().user.gsId), cx, y + 182, 0xA0A0A0);
+                ConfigManager.get().user.gsId), cx, y + 186, 0xA0A0A0);
     }
 
     private void label(MatrixStack matrices, int x, int y, String key) {

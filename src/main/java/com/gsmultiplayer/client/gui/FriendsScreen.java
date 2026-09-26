@@ -54,7 +54,7 @@ public final class FriendsScreen extends GsBaseScreen {
         addButton(new ButtonWidget(cx - 200, rowBottom, 148, 18,
                 GsText.t("gs.multiplayer.refresh_presence"), b -> mod().rooms().watchFriends()));
 
-        int formY = rowBottom + 24;
+        int formY = rowBottom + 30;
         idField = new TextFieldWidget(this.textRenderer, cx - 250, formY, 120, 18,
                 GsText.t("gs.multiplayer.gs_id_hint"));
         idField.setMaxLength(16);
@@ -141,7 +141,7 @@ public final class FriendsScreen extends GsBaseScreen {
         List<Friend> list = friends();
         int cx = this.width / 2;
         int y = this.height / 4 + 8;
-        int formY = y + ROWS * 22 + 28;
+        int formY = y + ROWS * 22 + 30;
         drawLeft(matrices, GsText.t("gs.multiplayer.gs_id_hint").getString(), cx - 250, formY - 10, 0x9090B0);
         drawLeft(matrices, GsText.t("gs.multiplayer.friend_name").getString(), cx - 122, formY - 10, 0x9090B0);
         if (list.isEmpty()) {

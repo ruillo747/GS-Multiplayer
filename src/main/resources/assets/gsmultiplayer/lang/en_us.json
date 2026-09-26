@@ -101,5 +101,8 @@
   "gs.multiplayer.server.target_offline": "That player is offline",
   "gs.multiplayer.server.not_in_room": "You are not in a room",
   "gs.multiplayer.server.relay_disabled": "The relay is not configured on the server",
-  "gs.multiplayer.server.generic": "Server error: %s"
+  "gs.multiplayer.server.generic": "Server error: %s",
+  "gui.done": "Done",
+  "gui.cancel": "Cancel",
+  "gs.multiplayer.esc_hint": "Esc - close without saving"
 }

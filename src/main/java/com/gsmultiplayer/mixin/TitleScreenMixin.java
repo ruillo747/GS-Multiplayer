@@ -30,8 +30,6 @@ public abstract class TitleScreenMixin {
         }
         GsLog.setMinecraftName(client.getSession().getUsername());
         com.gsmultiplayer.client.GsText.sync(client);
-        GsLog.info("Title button text resolves to: '"
-                + GsText.t("gs.multiplayer.title").getString() + "'");
         TitleScreen self = (TitleScreen) (Object) this;
         int y = self.height / 4 + 48 + 24 * 4;
         ((ScreenAddButtonInvoker) self).gsmultiplayer$addButton(new ButtonWidget(
