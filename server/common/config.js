@@ -1,6 +1,31 @@
 'use strict';
 
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+
+// Loads ./.env (KEY=VALUE lines) before reading process.env. Values already
+// present in the environment always win. Lets panel users configure the server
+// by simply uploading a .env file next to package.json.
+(function loadDotEnv() {
+    const file = path.join(__dirname, '..', '.env');
+    try {
+        const text = fs.readFileSync(file, 'utf8');
+        for (const rawLine of text.split(/\r?\n/)) {
+            const line = rawLine.trim();
+            if (!line || line.startsWith('#')) continue;
+            const eq = line.indexOf('=');
+            if (eq <= 0) continue;
+            const key = line.slice(0, eq).trim();
+            const value = line.slice(eq + 1).trim().replace(/^["']|["']$/g, '');
+            if (!(key in process.env)) {
+                process.env[key] = value;
+            }
+        }
+    } catch (e) {
+        // no .env file - environment variables only, which is fine
+    }
+})();
 
 function num(name, def) {
     const raw = process.env[name];
