@@ -6,9 +6,9 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.TranslatableText;
 
 import java.util.List;
+import com.gsmultiplayer.client.GsText;
 
 /** Local friends list with temporary presence and invitations. */
 public final class FriendsScreen extends GsBaseScreen {
@@ -20,7 +20,7 @@ public final class FriendsScreen extends GsBaseScreen {
     private int offset;
 
     public FriendsScreen(Screen parent) {
-        super(new TranslatableText("gs.multiplayer.friends_title"), parent);
+        super(GsText.t("gs.multiplayer.friends_title"), parent);
     }
 
     @Override
@@ -32,41 +32,41 @@ public final class FriendsScreen extends GsBaseScreen {
         for (int i = 0; i < ROWS; i++) {
             final int index = i;
             ButtonWidget invite = addButton(new ButtonWidget(cx + 128, y + i * 22, 76, 18,
-                    new TranslatableText("gs.multiplayer.invite_short"), b -> inviteAt(index)));
+                    GsText.t("gs.multiplayer.invite_short"), b -> inviteAt(index)));
             invite.visible = false;
             ButtonWidget remove = addButton(new ButtonWidget(cx + 208, y + i * 22, 42, 18,
-                    new TranslatableText("gs.multiplayer.remove_short"), b -> removeAt(index)));
+                    GsText.t("gs.multiplayer.remove_short"), b -> removeAt(index)));
             remove.visible = false;
         }
 
         ButtonWidget scrollUp = addButton(new ButtonWidget(cx - 250, rowBottom, 20, 18,
-                new TranslatableText("gs.multiplayer.scroll_up"), b -> {
+                GsText.t("gs.multiplayer.scroll_up"), b -> {
             if (offset > 0) {
                 offset--;
                 refreshRows();
             }
         }));
         ButtonWidget scrollDown = addButton(new ButtonWidget(cx - 226, rowBottom, 20, 18,
-                new TranslatableText("gs.multiplayer.scroll_down"), b -> {
+                GsText.t("gs.multiplayer.scroll_down"), b -> {
             offset++;
             refreshRows();
         }));
         addButton(new ButtonWidget(cx - 200, rowBottom, 148, 18,
-                new TranslatableText("gs.multiplayer.refresh_presence"), b -> mod().rooms().watchFriends()));
+                GsText.t("gs.multiplayer.refresh_presence"), b -> mod().rooms().watchFriends()));
 
         int formY = rowBottom + 24;
         idField = new TextFieldWidget(this.textRenderer, cx - 250, formY, 120, 18,
-                new TranslatableText("gs.multiplayer.gs_id_hint"));
+                GsText.t("gs.multiplayer.gs_id_hint"));
         idField.setMaxLength(16);
         nameField = new TextFieldWidget(this.textRenderer, cx - 122, formY, 128, 18,
-                new TranslatableText("gs.multiplayer.friend_name"));
+                GsText.t("gs.multiplayer.friend_name"));
         nameField.setMaxLength(24);
         addButton(idField);
         addButton(nameField);
         addButton(new ButtonWidget(cx + 14, formY, 106, 18,
-                new TranslatableText("gs.multiplayer.add_friend"), b -> addFriend()));
+                GsText.t("gs.multiplayer.add_friend"), b -> addFriend()));
         addButton(new ButtonWidget(cx + 128, formY, 122, 18,
-                new TranslatableText("gui.back"), b -> onClose()));
+                GsText.t("gui.back"), b -> onClose()));
 
         mod().rooms().watchFriends();
         refreshRows();
@@ -142,7 +142,7 @@ public final class FriendsScreen extends GsBaseScreen {
         int cx = this.width / 2;
         int y = this.height / 4 + 8;
         if (list.isEmpty()) {
-            drawCentered(matrices, new TranslatableText("gs.multiplayer.no_friends"),
+            drawCentered(matrices, GsText.t("gs.multiplayer.no_friends"),
                     cx, y + 8, 0xA0A0A0);
         }
         for (int i = 0; i < ROWS; i++) {

@@ -17,6 +17,14 @@ public abstract class GsBaseScreen extends Screen {
     }
 
     @Override
+    protected void init() {
+        super.init();
+        if (this.client != null) {
+            com.gsmultiplayer.client.GsText.sync(this.client);
+        }
+    }
+
+    @Override
     public void onClose() {
         if (this.client != null) {
             this.client.openScreen(parent);

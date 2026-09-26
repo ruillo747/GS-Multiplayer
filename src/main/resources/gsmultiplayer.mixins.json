@@ -8,7 +8,7 @@
     "TitleScreenMixin",
     "GameMenuScreenMixin",
     "MinecraftClientMixin",
-    "ScreenAccessor"
+    "ScreenAddButtonInvoker"
   ],
   "injectors": {
     "defaultRequire": 1

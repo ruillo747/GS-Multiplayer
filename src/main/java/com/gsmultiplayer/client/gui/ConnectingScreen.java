@@ -5,9 +5,9 @@ import com.gsmultiplayer.util.GsLog;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.TranslatableText;
 
 import java.util.List;
+import com.gsmultiplayer.client.GsText;
 
 /** Shown while joining a room: negotiation, punching or relay fallback in progress. */
 public final class ConnectingScreen extends GsBaseScreen {
@@ -15,13 +15,13 @@ public final class ConnectingScreen extends GsBaseScreen {
     private long openedAt = System.currentTimeMillis();
 
     public ConnectingScreen(Screen parent) {
-        super(new TranslatableText("gs.multiplayer.connecting_title"), parent);
+        super(GsText.t("gs.multiplayer.connecting_title"), parent);
     }
 
     @Override
     protected void init() {
         addButton(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 110, 200, 20,
-                new TranslatableText("gs.multiplayer.cancel"), b -> {
+                GsText.t("gs.multiplayer.cancel"), b -> {
             mod().rooms().leaveRoom();
             onClose();
         }));
@@ -42,7 +42,7 @@ public final class ConnectingScreen extends GsBaseScreen {
         } else {
             statusKey = "gs.multiplayer.connecting_negotiating";
         }
-        drawCentered(matrices, new TranslatableText(statusKey), cx, this.height / 4 + 10, 0xFFFF55);
+        drawCentered(matrices, GsText.t(statusKey), cx, this.height / 4 + 10, 0xFFFF55);
 
         // animated dots
         long dots = (System.currentTimeMillis() - openedAt) / 400 % 4;

@@ -5,9 +5,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConnectScreen;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
+import com.gsmultiplayer.client.GsText;
 
 /** Minecraft-side helpers shared by all GS Multiplayer screens. */
 public final class GuiUtil {
@@ -18,7 +18,7 @@ public final class GuiUtil {
     public static void chat(MinecraftClient client, String key, Object... args) {
         if (client.player != null && client.inGameHud != null) {
             client.inGameHud.getChatHud().addMessage(new LiteralText("§7[GS]§r ")
-                    .append(new TranslatableText(key, args)));
+                    .append(GsText.t(key, args)));
         }
     }
 
@@ -26,7 +26,7 @@ public final class GuiUtil {
         if (client.player != null) {
             chat(client, key, args);
         } else {
-            toast(client, new TranslatableText("gs.multiplayer.title"), new TranslatableText(key, args));
+            toast(client, GsText.t("gs.multiplayer.title"), GsText.t(key, args));
         }
     }
 

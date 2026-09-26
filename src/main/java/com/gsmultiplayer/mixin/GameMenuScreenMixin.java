@@ -8,11 +8,11 @@ import com.gsmultiplayer.util.GsLog;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.TranslatableText;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import com.gsmultiplayer.client.GsText;
 
 /** Adds the GS Multiplayer button to the pause (game menu) screen while in a singleplayer world. */
 @Mixin(GameMenuScreen.class)
@@ -24,15 +24,17 @@ public abstract class GameMenuScreenMixin {
         if (client.getServer() == null) {
             return; // multiplayer worlds are not hosted by this mod
         }
-        if (client.getSession() != null) {
-            GsLog.setMinecraftName(client.getSession().getUsername());
-        }
         if (!ConfigManager.get().ui.showPauseButton) {
             return;
         }
+        if (client.getSession() != null) {
+            GsLog.setMinecraftName(client.getSession().getUsername());
+        }
+        com.gsmultiplayer.client.GsText.sync(client);
         GameMenuScreen self = (GameMenuScreen) (Object) this;
-        ((ScreenAccessor) self).getButtons().add(new ButtonWidget(self.width / 2 - 100, self.height / 4 + 120 + 8, 200, 20,
-                new TranslatableText("gs.multiplayer.title"),
+        ((ScreenAddButtonInvoker) self).gsmultiplayer$addButton(new ButtonWidget(
+                self.width / 2 - 100, self.height / 4 + 120 + 8, 200, 20,
+                GsText.t("gs.multiplayer.title"),
                 button -> {
                     GsMultiplayerClient mod = GsMultiplayerClient.get();
                     if (mod != null && mod.rooms().isHosting()) {

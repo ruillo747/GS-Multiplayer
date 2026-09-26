@@ -10,7 +10,6 @@
   "gs.multiplayer.settings_title": "GS Multiplayer settings",
   "gs.multiplayer.diagnostics": "Diagnostics",
   "gs.multiplayer.diagnostics_title": "GS Multiplayer diagnostics",
-
   "gs.multiplayer.status_online": "Server: online",
   "gs.multiplayer.status_offline": "Server: offline, retrying…",
   "gs.multiplayer.your_id": "Your GS ID: %s",
@@ -23,7 +22,6 @@
   "gs.multiplayer.code_hint": "Room code",
   "gs.multiplayer.cancel": "Cancel",
   "gs.multiplayer.loading_world": "Loading…",
-
   "gs.multiplayer.invite_from": "Invite from %s — Accept",
   "gs.multiplayer.decline": "Decline",
   "gs.multiplayer.invite_short": "Invite",
@@ -36,7 +34,6 @@
   "gs.multiplayer.refresh_presence": "Refresh presence",
   "gs.multiplayer.scroll_up": "↑",
   "gs.multiplayer.scroll_down": "↓",
-
   "gs.multiplayer.host_title": "Open your world to friends",
   "gs.multiplayer.room_name": "Room name",
   "gs.multiplayer.game_mode": "Game mode: %s",
@@ -49,12 +46,10 @@
   "gs.multiplayer.close_room": "Close room",
   "gs.multiplayer.room_closing": "Closing…",
   "gs.multiplayer.waiting_players": "Waiting for players… (max 4)",
-
   "gs.multiplayer.connecting_title": "Connecting",
   "gs.multiplayer.connecting_negotiating": "Negotiating P2P connection",
   "gs.multiplayer.connecting_launch": "Tunnel ready, launching Minecraft",
   "gs.multiplayer.connecting_stopped": "Connection stopped",
-
   "gs.multiplayer.nickname": "Nickname",
   "gs.multiplayer.signaling_url": "Signaling server (ws:// or wss://)",
   "gs.multiplayer.relay_host": "Relay host (optional)",
@@ -65,7 +60,6 @@
   "gs.multiplayer.title_button": "Show main menu button",
   "gs.multiplayer.pause_button": "Show pause menu button",
   "gs.multiplayer.save": "Save",
-
   "gs.multiplayer.check_updates": "Check for updates",
   "gs.multiplayer.copy_log": "Copy log",
   "gs.multiplayer.diag_summary": "Version: %s | Server: %s | Phase: %s",
@@ -75,10 +69,8 @@
   "gs.multiplayer.diag_loss": "Packet loss",
   "gs.multiplayer.dev_hint": "Enable developer mode in settings for P2P stats.",
   "gs.multiplayer.update_available": "New version available: GS Multiplayer %s",
-
   "gs.multiplayer.update_details": "Details",
   "gs.multiplayer.update_download": "Download",
-
   "gs.multiplayer.chat.room_opened": "Room is open! Code: §e%s§r — share it with friends",
   "gs.multiplayer.chat.player_joined": "%s joined the room",
   "gs.multiplayer.chat.player_left": "%s left",
@@ -89,7 +81,6 @@
   "gs.multiplayer.chat.reconnected": "Server connection restored; the room code may have changed",
   "gs.multiplayer.chat.peer_connected": "%s connected via %s",
   "gs.multiplayer.chat.lost": "Lost connection to %s",
-
   "gs.multiplayer.error.create": "Failed to create the room: %s",
   "gs.multiplayer.error.bad_code": "Invalid room code",
   "gs.multiplayer.error.join": "Failed to join: %s",
@@ -103,7 +94,6 @@
   "gs.multiplayer.error.relay_failed": "Relay is unavailable for %s",
   "gs.multiplayer.error.local_port": "Failed to open a local port: %s",
   "gs.multiplayer.error.host_lost": "Lost connection to the host",
-
   "gs.multiplayer.server.room_not_found": "Room not found",
   "gs.multiplayer.server.room_full": "The room is full (max 4 players)",
   "gs.multiplayer.server.bad_code": "Invalid room code",

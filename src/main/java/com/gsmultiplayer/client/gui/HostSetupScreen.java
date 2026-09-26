@@ -10,8 +10,8 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.world.GameMode;
+import com.gsmultiplayer.client.GsText;
 
 /** Publishes the running singleplayer world and opens a room for it. */
 public final class HostSetupScreen extends GsBaseScreen {
@@ -23,7 +23,7 @@ public final class HostSetupScreen extends GsBaseScreen {
     private CheckboxWidget cheatsBox;
 
     public HostSetupScreen(Screen parent) {
-        super(new TranslatableText("gs.multiplayer.host_title"), parent);
+        super(GsText.t("gs.multiplayer.host_title"), parent);
     }
 
     @Override
@@ -32,30 +32,30 @@ public final class HostSetupScreen extends GsBaseScreen {
         int y = this.height / 4 + 8;
 
         nameField = new TextFieldWidget(this.textRenderer, cx - 100, y, 200, 20,
-                new TranslatableText("gs.multiplayer.room_name"));
+                GsText.t("gs.multiplayer.room_name"));
         nameField.setMaxLength(32);
         nameField.setText(defaultRoomName());
         addButton(nameField);
 
         ButtonWidget modeButton = addButton(new ButtonWidget(cx - 100, y + 26, 200, 20,
-                new TranslatableText("gs.multiplayer.game_mode", modeName(MODES[modeIndex])),
+                GsText.t("gs.multiplayer.game_mode", modeName(MODES[modeIndex])),
                 b -> {
                     modeIndex = (modeIndex + 1) % MODES.length;
-                    b.setMessage(new TranslatableText("gs.multiplayer.game_mode",
+                    b.setMessage(GsText.t("gs.multiplayer.game_mode",
                             modeName(MODES[modeIndex])));
                 }));
 
         cheatsBox = addButton(new CheckboxWidget(cx - 100, y + 50, 200, 20,
-                new TranslatableText("gs.multiplayer.cheats"), false));
+                GsText.t("gs.multiplayer.cheats"), false));
 
         addButton(new ButtonWidget(cx - 100, y + 78, 200, 20,
-                new TranslatableText("gs.multiplayer.open_room"), b -> openRoom()));
+                GsText.t("gs.multiplayer.open_room"), b -> openRoom()));
         addButton(new ButtonWidget(cx - 100, y + 102, 200, 20,
-                new TranslatableText("gui.cancel"), b -> onClose()));
+                GsText.t("gui.cancel"), b -> onClose()));
     }
 
-    private static TranslatableText modeName(GameMode mode) {
-        return new TranslatableText("selectWorld.gameMode." + mode.getName());
+    private static net.minecraft.text.Text modeName(GameMode mode) {
+        return GsText.t("selectWorld.gameMode." + mode.getName());
     }
 
     private String defaultRoomName() {
@@ -81,8 +81,8 @@ public final class HostSetupScreen extends GsBaseScreen {
         }
         if (!published) {
             GuiUtil.toast(this.client,
-                    new TranslatableText("gs.multiplayer.title"),
-                    new TranslatableText("gs.multiplayer.lan_warn"));
+                    GsText.t("gs.multiplayer.title"),
+                    GsText.t("gs.multiplayer.lan_warn"));
             GsLog.warn("openToLan returned false; the port may already be in use");
         }
         String roomName = nameField.getText().trim();

@@ -6,9 +6,9 @@ import com.gsmultiplayer.room.RoomManager;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.TranslatableText;
 
 import java.util.List;
+import com.gsmultiplayer.client.GsText;
 
 /** Searches rooms on the signaling server and joins the picked one. */
 public final class RoomBrowserScreen extends GsBaseScreen {
@@ -19,7 +19,7 @@ public final class RoomBrowserScreen extends GsBaseScreen {
     private boolean loading = true;
 
     public RoomBrowserScreen(Screen parent) {
-        super(new TranslatableText("gs.multiplayer.browse_title"), parent);
+        super(GsText.t("gs.multiplayer.browse_title"), parent);
     }
 
     @Override
@@ -29,14 +29,14 @@ public final class RoomBrowserScreen extends GsBaseScreen {
         for (int i = 0; i < SLOTS; i++) {
             final int index = i;
             ButtonWidget button = addButton(new ButtonWidget(cx - 150, y + i * 24, 300, 20,
-                    new TranslatableText("gs.multiplayer.empty_slot"), b -> joinRoomAt(index)));
+                    GsText.t("gs.multiplayer.empty_slot"), b -> joinRoomAt(index)));
             button.visible = false;
             button.active = false;
         }
         addButton(new ButtonWidget(cx - 150, y + SLOTS * 24 + 8, 148, 20,
-                new TranslatableText("gs.multiplayer.refresh"), b -> refresh()));
+                GsText.t("gs.multiplayer.refresh"), b -> refresh()));
         addButton(new ButtonWidget(cx + 2, y + SLOTS * 24 + 8, 148, 20,
-                new TranslatableText("gui.back"), b -> onClose()));
+                GsText.t("gui.back"), b -> onClose()));
         refresh();
     }
 
@@ -61,7 +61,7 @@ public final class RoomBrowserScreen extends GsBaseScreen {
             ButtonWidget button = (ButtonWidget) this.buttons.get(i);
             if (i < shown) {
                 RoomEntry room = list.get(i);
-                button.setMessage(new TranslatableText("gs.multiplayer.room_entry",
+                button.setMessage(GsText.t("gs.multiplayer.room_entry",
                         room.name, room.players, room.maxPlayers, room.code));
                 button.visible = true;
                 button.active = canJoin();
@@ -95,10 +95,10 @@ public final class RoomBrowserScreen extends GsBaseScreen {
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
         if (loading) {
-            drawCentered(matrices, new TranslatableText("gs.multiplayer.loading"),
+            drawCentered(matrices, GsText.t("gs.multiplayer.loading"),
                     this.width / 2, this.height / 4 + 4, 0xA0A0A0);
         } else if (rooms != null && rooms.isEmpty()) {
-            drawCentered(matrices, new TranslatableText("gs.multiplayer.no_rooms"),
+            drawCentered(matrices, GsText.t("gs.multiplayer.no_rooms"),
                     this.width / 2, this.height / 4 + 4, 0xA0A0A0);
         }
     }
