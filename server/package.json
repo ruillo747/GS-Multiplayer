@@ -6,10 +6,10 @@
   "license": "MIT",
   "main": "signaling/index.js",
   "scripts": {
-    "start": "node signaling/index.js",
+    "start": "node start-all.js",
+    "start:signaling": "node signaling/index.js",
     "start:relay": "node relay/index.js",
-    "test": "node test/e2e.js",
-    "start:all": "node start-all.js"
+    "test": "node test/e2e.js"
   },
   "engines": {
     "node": ">=16"

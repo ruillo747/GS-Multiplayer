@@ -35,23 +35,27 @@ permalink: /pterodactyl/
 | Поле | Значение |
 |---|---|
 | Egg / Docker image | Node.js (generic), Node **18+** |
-| Startup Command или Main/JS file | `node start-all.js` (если панель даёт только имя файла — впишите `start-all.js`) |
+| Startup Command или Main/JS file | `node start-all.js` (если панель даёт только имя файла — впишите `start-all.js`; подходит и обычный `npm start` — он теперь делает то же самое) |
 
 ## Шаг 3. Задайте переменные
 
 Там же, во вкладке Startup (Variables), заполните:
 
+Обязательны только две переменные, остальные панель подставит сама
+(generic Node.js Egg всегда выставляет `SERVER_PORT` = порт аллокации — signaling
+использует его автоматически, если не задан `SIGNALING_PORT`):
+
 | Переменная | Значение | Зачем |
 |---|---|---|
-| `SIGNALING_PORT` | **главный порт аллокации** (на скрине — `25607`) | порт, на котором слушает signaling |
 | `RELAY_SECRET` | любая длинная случайная строка | подпись relay-токенов |
-| `RELAY_PORT` | второй порт, если выдали (иначе оставьте `35501`) | порт relay (UDP) |
 | `RELAY_PUBLIC_HOST` | `z1.zertix.pw` (ваш адрес без порта) | хост, который прописывается клиентам в relay-токен |
+| `SIGNALING_PORT` | не обязательно: по умолчанию берётся `SERVER_PORT` панели | порт signaling |
+| `RELAY_PORT` | второй порт, если выдали (иначе оставьте `35501`) | порт relay (UDP) |
 
 Если панель не позволяет добавлять переменные — задайте их прямо в startup-команде:
 
 ```
-SIGNALING_PORT=25607 RELAY_SECRET=моя-строка RELAY_PUBLIC_HOST=z1.zertix.pw node start-all.js
+RELAY_SECRET=моя-строка RELAY_PUBLIC_HOST=z1.zertix.pw node start-all.js
 ```
 
 ## Шаг 4. Установите зависимости и запустите

@@ -16,7 +16,9 @@ function str(name, def) {
 }
 
 const config = {
-    signalingPort: num('SIGNALING_PORT', 35500),
+    // Pterodactyl and similar panels always provide SERVER_PORT (the allocation);
+    // it is the natural default for signaling when SIGNALING_PORT is not set.
+    signalingPort: num('SIGNALING_PORT', num('SERVER_PORT', 35500)),
     relayPort: num('RELAY_PORT', 35501),
     // Public IP/hostname advertised to clients in relay tokens (must be reachable from outside).
     relayPublicHost: str('RELAY_PUBLIC_HOST', ''),
