@@ -8,7 +8,14 @@ public final class GsMultiplayerMod {
 
     public static final String MOD_ID = "gsmultiplayer";
     public static final String MOD_NAME = "GS Multiplayer";
-    public static final String VERSION = "1.0.0";
+    /**
+     * Read from the loader metadata so the value always matches fabric.mod.json
+     * (a hardcoded constant drifts every release and breaks the update checker).
+     */
+    public static final String VERSION = net.fabricmc.loader.api.FabricLoader.getInstance()
+            .getModContainer(MOD_ID)
+            .map(container -> container.getMetadata().getVersion().getFriendlyString())
+            .orElse("0.0.0");
     public static final int MAX_PLAYERS = 4;
 
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);

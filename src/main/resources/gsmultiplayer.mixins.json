@@ -7,7 +7,8 @@
   "client": [
     "TitleScreenMixin",
     "GameMenuScreenMixin",
-    "MinecraftClientMixin"
+    "MinecraftClientMixin",
+    "ScreenAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
