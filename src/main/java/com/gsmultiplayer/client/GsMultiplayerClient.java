@@ -70,8 +70,6 @@ public final class GsMultiplayerClient implements ClientModInitializer {
         rooms = new RoomManager(config, friends, minecraftThreadExecutor);
         rooms.addListener(new GlobalUiListener());
 
-        GsLog.setMinecraftName(client.getSession().getUsername());
-
         Runtime.getRuntime().addShutdownHook(new Thread(rooms::shutdown, "gs-shutdown"));
 
         if (config.updates.enabled && config.updates.checkOnStartup) {
