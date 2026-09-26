@@ -44,6 +44,7 @@ node relay/index.js                   # порт 35501 UDP (relay, опцион�
 | [Запуск для игроков](RUNNING.md) | установка, комнаты, друзья, диагностика |
 | [Сборка из исходников](BUILDING.md) | Gradle, тесты, релизы |
 | [Развёртывание сервера](DEPLOY.md) | VPS, systemd, TLS/wss, файрвол |
+| [Деплой на Pterodactyl-панели](PTERODACTYL.md) | zertix.pw и любые Pterodactyl: загрузка, переменные, старт | 
 | [API signaling-сервера](SERVER_API.md) | протокол WebSocket, комнаты, presence |
 | [Сетевые протоколы](PROTOCOL.md) | P2P, NAT punch, relay, надёжный канал |
 

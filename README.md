@@ -71,6 +71,7 @@ node relay/index.js       # UDP 35501: relay
 - [docs/RUNNING.md](docs/RUNNING.md) — запуск для игроков (RU)
 - [docs/BUILDING.md](docs/BUILDING.md) — сборка из исходников (RU)
 - [docs/DEPLOY.md](docs/DEPLOY.md) — развёртывание signaling/relay на VPS: systemd, TLS/wss, файрвол (RU)
+- [docs/PTERODACTYL.md](docs/PTERODACTYL.md) — деплой на панелях Pterodactyl (zertix.pw и др.) (RU)
 - [docs/SERVER_API.md](docs/SERVER_API.md) — API signaling-сервера (RU)
 - [docs/PROTOCOL.md](docs/PROTOCOL.md) — сетевые протоколы P2P/Relay (RU)
 
