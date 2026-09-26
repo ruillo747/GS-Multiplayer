@@ -24,11 +24,23 @@ function start(options = {}) {
     });
 
     // ---- http (health/stats) ---------------------------------------------
+    const startedAt = Date.now();
     const server = http.createServer((req, res) => {
         let pathname = '/';
         try {
             pathname = new URL(req.url, 'http://localhost').pathname;
         } catch (e) { /* fallthrough */ }
+        if (pathname === '/') {
+            return html(res, 200, statusPage({
+                uptimeSec: Math.floor((Date.now() - startedAt) / 1000),
+                sessions: sessions.size,
+                rooms: rooms.stats(),
+                presence: presence.stats(),
+                relayEnabled: !!config.relayPublicHost,
+                relayHost: config.relayPublicHost || '(not configured)',
+                relayPort: config.relayPort
+            }));
+        }
         if (pathname === '/health') {
             return json(res, 200, {
                 ok: true,
@@ -297,6 +309,46 @@ function sendError(session, of, code) {
 function json(res, code, obj) {
     res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify(obj));
+}
+
+function html(res, code, body) {
+    res.writeHead(code, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(body);
+}
+
+// Minimal self-contained status dashboard for the live preview / quick checks.
+function statusPage(s) {
+    const esc = (t) => String(t).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+    return '<!DOCTYPE html><html><head><meta charset="utf-8">'
+        + '<meta http-equiv="refresh" content="5">'
+        + '<title>GS Multiplayer server</title></head>'
+        + '<body style="margin:0;font-family:Segoe UI,Roboto,sans-serif;background:#14162b;color:#e8eaf6;'
+        + 'display:flex;align-items:center;justify-content:center;min-height:100vh">'
+        + '<div style="max-width:460px;width:92%;background:#1d2040;border-radius:14px;padding:28px 32px;'
+        + 'box-shadow:0 8px 40px rgba(0,0,0,.45)">'
+        + '<div style="font-size:13px;letter-spacing:.14em;color:#8f9bd4;text-transform:uppercase">GS Multiplayer</div>'
+        + '<h1 style="margin:6px 0 18px;font-size:26px">Signaling server</h1>'
+        + '<div style="display:flex;align-items:center;gap:9px;margin-bottom:20px">'
+        + '<span style="width:11px;height:11px;border-radius:50%;background:#3ddc84;box-shadow:0 0 10px #3ddc84"></span>'
+        + '<span style="font-size:15px;color:#b6c0f2">online &middot; uptime ' + s.uptimeSec + 's</span></div>'
+        + '<table style="width:100%;border-collapse:collapse;font-size:14px">'
+        + row('Sessions', s.sessions)
+        + row('Rooms / players', s.rooms.rooms + ' / ' + s.rooms.players)
+        + row('Presence online', s.presence.online)
+        + row('Presence watchers', s.presence.watchers)
+        + row('Relay fallback', s.relayEnabled ? 'enabled &middot; ' + esc(s.relayHost) + ':' + s.relayPort + '/udp' : 'disabled (set RELAY_PUBLIC_HOST)')
+        + '</table>'
+        + '<div style="margin-top:20px;font-size:12.5px;color:#7f8ac9;line-height:1.7">'
+        + 'WebSocket: <code style="color:#9fb4ff">ws://&lt;this-host&gt;:35500/</code><br>'
+        + 'Endpoints: <code style="color:#9fb4ff">/health</code> &middot; <code style="color:#9fb4ff">/stats</code>'
+        + ' &middot; relay UDP ' + s.relayPort
+        + '<br>Auto-refresh every 5s</div>'
+        + '</div></body></html>';
+
+    function row(label, value) {
+        return '<tr><td style="padding:7px 0;color:#8f9bd4">' + label
+            + '</td><td style="padding:7px 0;text-align:right;font-weight:600">' + value + '</td></tr>';
+    }
 }
 
 function cleanName(raw, fallback) {
