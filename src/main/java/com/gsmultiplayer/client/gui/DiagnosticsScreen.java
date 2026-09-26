@@ -45,8 +45,8 @@ public final class DiagnosticsScreen extends GsBaseScreen {
         int left = cx - 204;
         RoomManager rooms = mod().rooms();
 
-        String state = GsText.t(rooms.isSignalingOnline()
-                ? "gs.multiplayer.status_online" : "gs.multiplayer.status_offline").getString();
+        String state = GsText.format(rooms.isSignalingOnline()
+                ? "gs.multiplayer.diag_online" : "gs.multiplayer.diag_offline");
         drawLeft(matrices, GsText.t("gs.multiplayer.diag_summary",
                 GsMultiplayerMod.VERSION, state, rooms.getPhase().name()).getString(), left, 32, 0xA0A0A0);
         drawLeft(matrices, GsText.t("gs.multiplayer.your_id",

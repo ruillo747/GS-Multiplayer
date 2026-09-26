@@ -61,8 +61,11 @@ public final class HostActiveScreen extends GsBaseScreen {
         drawCentered(matrices, code == null ? "…" : code, cx, this.height / 4 - 4, 0x55FFFF);
 
         if (code == null) {
-            drawCentered(matrices, GsText.t("gs.multiplayer.room_closing"),
-                    cx, this.height / 4 + 16, 0xFF5555);
+            // no code yet: either the room is closing or signaling is unreachable
+            boolean offline = !mod.rooms().isSignalingOnline();
+            drawCentered(matrices, GsText.t(offline
+                    ? "gs.multiplayer.waiting_server" : "gs.multiplayer.room_closing"),
+                    cx, this.height / 4 + 16, offline ? 0xA0A0A0 : 0xFF5555);
             return;
         }
         List<com.gsmultiplayer.room.RoomManager.PeerDiagnostics> peers = mod.rooms().peerDiagnostics();

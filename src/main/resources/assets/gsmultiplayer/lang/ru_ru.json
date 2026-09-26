@@ -31,7 +31,7 @@
   "gs.multiplayer.friend_name": "Имя",
   "gs.multiplayer.gs_id_hint": "GS-XXXXXXXX",
   "gs.multiplayer.no_friends": "Список пуст. Добавьте друга по его GS ID.",
-  "gs.multiplayer.refresh_presence": "Обновить presence",
+  "gs.multiplayer.refresh_presence": "Обновить статус",
   "gs.multiplayer.scroll_up": "↑",
   "gs.multiplayer.scroll_down": "↓",
   "gs.multiplayer.host_title": "Открыть мир для друзей",
@@ -51,7 +51,7 @@
   "gs.multiplayer.connecting_launch": "Туннель готов, запускаем Minecraft",
   "gs.multiplayer.connecting_stopped": "Подключение остановлено",
   "gs.multiplayer.nickname": "Никнейм",
-  "gs.multiplayer.signaling_url": "Signaling-сервер (ws:// или wss://)",
+  "gs.multiplayer.signaling_url": "Signaling-сервер",
   "gs.multiplayer.relay_host": "Адрес Relay (необязательно)",
   "gs.multiplayer.relay_port": "Порт Relay",
   "gs.multiplayer.lan_port": "Локальный LAN-порт",
@@ -129,5 +129,12 @@
   "gs.multiplayer.firewall": "Правила брандмауэра",
   "gs.multiplayer.firewall_done": "Правила брандмауэра пересозданы",
   "gs.multiplayer.firewall_unavailable": "Только для Windows",
-  "gui.back": "Назад"
+  "gui.back": "Назад",
+  "gs.multiplayer.mode.survival": "Выживание",
+  "gs.multiplayer.mode.creative": "Творчество",
+  "gs.multiplayer.mode.adventure": "Приключение",
+  "gs.multiplayer.default_world_name": "Мир %s",
+  "gs.multiplayer.diag_online": "онлайн",
+  "gs.multiplayer.diag_offline": "оффлайн, переподключение…",
+  "gs.multiplayer.waiting_server": "Ожидаю signaling-сервер..."
 }

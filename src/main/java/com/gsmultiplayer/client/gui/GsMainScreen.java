@@ -27,19 +27,20 @@ public final class GsMainScreen extends GsBaseScreen {
         int doneY;
         int inviteY;
         if (compact) {
-            // 2-column grid: the whole menu must fit 240 GUI units
+            // 2-column grid: the whole menu must fit 240 GUI units.
+            // 148-wide columns: long RU labels ("Подключиться по коду") must fit
             int y0 = 48;
-            addButton(new ButtonWidget(cx - 100, y0, 98, 20,
+            addButton(new ButtonWidget(cx - 150, y0, 148, 20,
                     GsText.t("gs.multiplayer.browse"), b -> client.openScreen(new RoomBrowserScreen(this))));
-            addButton(new ButtonWidget(cx + 2, y0, 98, 20,
+            addButton(new ButtonWidget(cx + 2, y0, 148, 20,
                     GsText.t("gs.multiplayer.join_by_code"), b -> client.openScreen(new JoinByCodeScreen(this))));
-            addButton(new ButtonWidget(cx - 100, y0 + 22, 98, 20,
+            addButton(new ButtonWidget(cx - 150, y0 + 22, 148, 20,
                     GsText.t("gs.multiplayer.join_by_ip"), b -> client.openScreen(new JoinByIpScreen(this))));
-            addButton(new ButtonWidget(cx + 2, y0 + 22, 98, 20,
+            addButton(new ButtonWidget(cx + 2, y0 + 22, 148, 20,
                     GsText.t("gs.multiplayer.friends"), b -> client.openScreen(new FriendsScreen(this))));
-            addButton(new ButtonWidget(cx - 100, y0 + 44, 98, 20,
+            addButton(new ButtonWidget(cx - 150, y0 + 44, 148, 20,
                     GsText.t("gs.multiplayer.settings"), b -> client.openScreen(new SettingsScreen(this))));
-            addButton(new ButtonWidget(cx + 2, y0 + 44, 98, 20,
+            addButton(new ButtonWidget(cx + 2, y0 + 44, 148, 20,
                     GsText.t("gs.multiplayer.diagnostics"), b -> client.openScreen(new DiagnosticsScreen(this))));
             actionY = y0 + 66;
             doneY = y0 + 90;

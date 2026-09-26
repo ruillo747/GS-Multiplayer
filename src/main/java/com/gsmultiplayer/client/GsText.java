@@ -77,7 +77,10 @@ public final class GsText {
         for (int i = 0; i < template.length(); i++) {
             char c = template.charAt(i);
             if (c == '%' && i + 1 < template.length() && template.charAt(i + 1) == 's' && argIndex < args.length) {
-                sb.append(args[argIndex++]);
+                Object arg = args[argIndex++];
+                // A Text argument must show its visible text, not the Java toString
+                // (which dumps style internals like "Style{ color=null, ... }").
+                sb.append(arg instanceof net.minecraft.text.Text ? ((net.minecraft.text.Text) arg).getString() : arg);
                 i++;
             } else {
                 sb.append(c);

@@ -33,39 +33,43 @@ public final class SettingsScreen extends GsBaseScreen {
     protected void init() {
         GsConfig config = ConfigManager.get();
         int cx = this.width / 2;
-        int y = this.height / 4 - 6;
+        boolean compact = this.height < 300;   // 854x480 windowed at scale 2
+        int y0 = compact ? 40 : this.height / 4 - 6;
+        int lx = cx - 150;   // left column
+        int rx = cx + 2;     // right column
 
-        nicknameField = addField(cx, y, config.user.nickname, 24, "gs.multiplayer.nickname");
-        signalingField = addField(cx, y + 26, config.signalingUrl, 128, "gs.multiplayer.signaling_url");
-        relayHostField = addField(cx, y + 52, config.relayHost, 100, "gs.multiplayer.relay_host");
+        nicknameField = addField(lx, y0, 148, config.user.nickname, 24, "gs.multiplayer.nickname");
 
-        relayPortField = new TextFieldWidget(this.textRenderer, cx + 104, y + 52, 96, 20,
+        relayPortField = new TextFieldWidget(this.textRenderer, rx, y0, 70, 20,
                 GsText.t("gs.multiplayer.relay_port"));
         relayPortField.setMaxLength(5);
         relayPortField.setTextPredicate(s -> s.matches("[0-9]*"));
         relayPortField.setText(String.valueOf(config.relayPort));
         addButton(relayPortField);
 
-        lanPortField = new TextFieldWidget(this.textRenderer, cx + 104, y + 78, 96, 20,
+        lanPortField = new TextFieldWidget(this.textRenderer, rx + 78, y0, 70, 20,
                 GsText.t("gs.multiplayer.lan_port"));
         lanPortField.setMaxLength(5);
         lanPortField.setTextPredicate(s -> s.matches("[0-9]*"));
         lanPortField.setText(String.valueOf(config.connection.lanPort));
         addButton(lanPortField);
 
-        // Compact column: the whole screen must fit 240 GUI units (scale-2 windowed mode).
-        devModeBox = addButton(new CheckboxWidget(cx - 100, y + 76, 200, 20,
+        signalingField = addField(lx, y0 + 34, 148, config.signalingUrl, 128, "gs.multiplayer.signaling_url");
+        relayHostField = addField(rx, y0 + 34, 148, config.relayHost, 100, "gs.multiplayer.relay_host");
+
+        // Checkbox labels are drawn by the widget itself; 4 rows fit easily now.
+        devModeBox = addButton(new CheckboxWidget(lx, y0 + 62, 300, 20,
                 GsText.t("gs.multiplayer.dev_mode"), config.diagnostics.devMode));
-        updatesBox = addButton(new CheckboxWidget(cx - 100, y + 96, 200, 20,
+        updatesBox = addButton(new CheckboxWidget(lx, y0 + 80, 300, 20,
                 GsText.t("gs.multiplayer.update_check"), config.updates.enabled));
-        titleButtonBox = addButton(new CheckboxWidget(cx - 100, y + 116, 200, 20,
+        titleButtonBox = addButton(new CheckboxWidget(lx, y0 + 98, 300, 20,
                 GsText.t("gs.multiplayer.title_button"), config.ui.showTitleButton));
-        upnpBox = addButton(new CheckboxWidget(cx - 100, y + 136, 200, 20,
+        upnpBox = addButton(new CheckboxWidget(lx, y0 + 116, 300, 20,
                 GsText.t("gs.multiplayer.settings_upnp"), config.connection.autoPortMap));
 
-        addButton(new ButtonWidget(cx - 100, y + 158, 98, 20,
+        addButton(new ButtonWidget(lx, y0 + 142, 148, 20,
                 GsText.t("gs.multiplayer.save"), b -> save()));
-        addButton(new ButtonWidget(cx + 2, y + 158, 98, 20,
+        addButton(new ButtonWidget(rx, y0 + 142, 148, 20,
                 GsText.t("gs.multiplayer.firewall"), b -> {
             boolean ok = com.gsmultiplayer.util.FirewallFix.recreateRules();
             GuiUtil.toast(client, GsText.t("gs.multiplayer.title"),
@@ -75,8 +79,8 @@ public final class SettingsScreen extends GsBaseScreen {
         // Esc closes the screen without saving - no extra Back button needed.
     }
 
-    private TextFieldWidget addField(int cx, int y, String value, int maxLength, String key) {
-        TextFieldWidget field = new TextFieldWidget(this.textRenderer, cx - 100, y, 200, 20,
+    private TextFieldWidget addField(int x, int y, int width, String value, int maxLength, String key) {
+        TextFieldWidget field = new TextFieldWidget(this.textRenderer, x, y, width, 20,
                 GsText.t(key));
         field.setMaxLength(maxLength);
         field.setText(value == null ? "" : value);
@@ -123,14 +127,17 @@ public final class SettingsScreen extends GsBaseScreen {
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
         int cx = this.width / 2;
-        int y = this.height / 4 - 6;
-        label(matrices, cx - 100, y - 11, "gs.multiplayer.nickname");
-        label(matrices, cx - 100, y + 15, "gs.multiplayer.signaling_url");
-        label(matrices, cx - 100, y + 41, "gs.multiplayer.relay_host");
-        label(matrices, cx + 104, y + 41, "gs.multiplayer.relay_port");
-        label(matrices, cx + 104, y + 67, "gs.multiplayer.lan_port");
+        boolean compact = this.height < 300;
+        int y0 = compact ? 40 : this.height / 4 - 6;
+        int lx = cx - 150;
+        int rx = cx + 2;
+        label(matrices, lx, y0 - 10, "gs.multiplayer.nickname");
+        label(matrices, rx, y0 - 10, "gs.multiplayer.relay_port");
+        label(matrices, rx + 78, y0 - 10, "gs.multiplayer.lan_port");
+        label(matrices, lx, y0 + 24, "gs.multiplayer.signaling_url");
+        label(matrices, rx, y0 + 24, "gs.multiplayer.relay_host");
         drawLeft(matrices, GsText.t("gs.multiplayer.esc_hint").getString(),
-                cx - 100, y + 178, 0x606080);
+                lx, y0 + 168, 0x606080);
     }
 
     private void label(MatrixStack matrices, int x, int y, String key) {

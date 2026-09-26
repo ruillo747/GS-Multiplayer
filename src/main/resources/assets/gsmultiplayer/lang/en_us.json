@@ -129,5 +129,12 @@
   "gs.multiplayer.firewall": "Firewall rules",
   "gs.multiplayer.firewall_done": "Firewall rules recreated",
   "gs.multiplayer.firewall_unavailable": "Available on Windows only",
-  "gui.back": "Back"
+  "gui.back": "Back",
+  "gs.multiplayer.mode.survival": "Survival",
+  "gs.multiplayer.mode.creative": "Creative",
+  "gs.multiplayer.mode.adventure": "Adventure",
+  "gs.multiplayer.default_world_name": "%s's world",
+  "gs.multiplayer.diag_online": "online",
+  "gs.multiplayer.diag_offline": "offline",
+  "gs.multiplayer.waiting_server": "Waiting for the signaling server..."
 }

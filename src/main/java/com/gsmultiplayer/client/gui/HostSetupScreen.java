@@ -7,6 +7,7 @@ import com.gsmultiplayer.config.ConfigManager;
 import com.gsmultiplayer.util.GsLog;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.server.integrated.IntegratedServer;
@@ -54,14 +55,23 @@ public final class HostSetupScreen extends GsBaseScreen {
                 GsText.t("gui.cancel"), b -> onClose()));
     }
 
-    private static net.minecraft.text.Text modeName(GameMode mode) {
-        return GsText.t("selectWorld.gameMode." + mode.getName());
+    @Override
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.render(matrices, mouseX, mouseY, delta);
+        int cx = this.width / 2;
+        int y = this.height / 4 + 8;
+        drawLeft(matrices, GsText.t("gs.multiplayer.room_name").getString(), cx - 100, y - 11, 0x9090B0);
+    }
+
+    private static String modeName(GameMode mode) {
+        // own keys: GsText knows only our lang files, never vanilla ones
+        return GsText.format("gs.multiplayer.mode." + mode.getName());
     }
 
     private String defaultRoomName() {
         String player = this.client != null && this.client.getSession() != null
                 ? this.client.getSession().getUsername() : "Player";
-        return player + "'s world";
+        return GsText.format("gs.multiplayer.default_world_name", player);
     }
 
     private void openRoom() {
