@@ -14,13 +14,13 @@ cd GS-Multiplayer
 ./gradlew build
 ```
 
-Результат: `build/libs/gsmultiplayer-1.0.0.jar` — готовый мод для `.minecraft/mods/`.
+Результат: `build/libs/gsmultiplayer-<версия>.jar` — готовый мод для `.minecraft/mods/`.
 
 Промежуточные артефакты:
 
 | Файл | Назначение |
 |---|---|
-| `build/libs/gsmultiplayer-1.0.0.jar` | основной мод (remapped в intermediary) |
+| `build/libs/gsmultiplayer-<версия>.jar` | основной мод (remapped в intermediary) |
 | `build/libs/gsmultiplayer-1.0.0-sources.jar` | исходники (не для игры) |
 | `build/devlibs/...-dev.jar` | дев-версия в named-маппингах (для запуска из IDE) |
 
@@ -55,7 +55,7 @@ E2E-тест поднимает signaling и relay на свободных по�
 
 ```bash
 ./gradlew build
-cp build/libs/gsmultiplayer-1.0.0.jar releases/
+cp build/libs/gsmultiplayer-<версия>.jar releases/
 ```
 
 Публикация релиза — тегом (см. `.github/workflows/release.yml`):

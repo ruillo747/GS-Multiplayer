@@ -4,6 +4,7 @@ import com.gsmultiplayer.client.GsMultiplayerClient;
 import com.gsmultiplayer.client.gui.GsMainScreen;
 import com.gsmultiplayer.config.ConfigManager;
 import com.gsmultiplayer.config.GsConfig;
+import com.gsmultiplayer.util.GsLog;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -27,6 +28,7 @@ public abstract class TitleScreenMixin {
         if (client.getSession() == null) {
             return;
         }
+        GsLog.setMinecraftName(client.getSession().getUsername());
         TitleScreen self = (TitleScreen) (Object) this;
         int y = self.height / 4 + 48 + 24 * 4;
         ((ScreenAccessor) self).getButtons().add(new ButtonWidget(self.width / 2 - 100, y + 16, 200, 20,

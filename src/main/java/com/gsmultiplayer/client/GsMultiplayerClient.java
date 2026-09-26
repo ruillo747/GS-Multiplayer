@@ -49,7 +49,9 @@ public final class GsMultiplayerClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         instance = this;
-        MinecraftClient client = MinecraftClient.getInstance();
+        // NOTE: client entrypoints run while MinecraftClient is still being constructed.
+        // MinecraftClient.getInstance()/getSession() are NOT usable here - touching them
+        // crashes the game before the title screen. Menu mixins capture the name later.
 
         ConfigManager.init(FabricLoader.getInstance().getGameDir());
         GsConfig config = ConfigManager.get();

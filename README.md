@@ -37,7 +37,7 @@ Minecraft Java 1.16.5
 ## Установка (игроку)
 
 1. Установите [Fabric Loader](https://fabricmc.net/use/installer/) для Minecraft **1.16.5**.
-2. Положите `gsmultiplayer-1.0.0.jar` (со страницы [Releases](../../releases)) в папку `.minecraft/mods/`.
+2. Положите `gsmultiplayer-<версия>.jar` (со страницы [Releases](../../releases)) в папку `.minecraft/mods/`.
 3. Запустите игру. В главном меню и в меню паузы появится кнопка **GS Multiplayer**.
 
 ## Быстрый старт (двое друзей)

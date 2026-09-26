@@ -4,6 +4,7 @@ import com.gsmultiplayer.client.GsMultiplayerClient;
 import com.gsmultiplayer.client.gui.HostActiveScreen;
 import com.gsmultiplayer.client.gui.HostSetupScreen;
 import com.gsmultiplayer.config.ConfigManager;
+import com.gsmultiplayer.util.GsLog;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -22,6 +23,9 @@ public abstract class GameMenuScreenMixin {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.getServer() == null) {
             return; // multiplayer worlds are not hosted by this mod
+        }
+        if (client.getSession() != null) {
+            GsLog.setMinecraftName(client.getSession().getUsername());
         }
         if (!ConfigManager.get().ui.showPauseButton) {
             return;
