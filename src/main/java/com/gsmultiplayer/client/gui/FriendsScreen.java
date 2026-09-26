@@ -141,6 +141,9 @@ public final class FriendsScreen extends GsBaseScreen {
         List<Friend> list = friends();
         int cx = this.width / 2;
         int y = this.height / 4 + 8;
+        int formY = y + ROWS * 22 + 28;
+        drawLeft(matrices, GsText.t("gs.multiplayer.gs_id_hint").getString(), cx - 250, formY - 10, 0x9090B0);
+        drawLeft(matrices, GsText.t("gs.multiplayer.friend_name").getString(), cx - 122, formY - 10, 0x9090B0);
         if (list.isEmpty()) {
             drawCentered(matrices, GsText.t("gs.multiplayer.no_friends"),
                     cx, y + 8, 0xA0A0A0);

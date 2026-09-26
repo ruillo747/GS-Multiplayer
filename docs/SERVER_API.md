@@ -1,3 +1,8 @@
+---
+layout: default
+title: "SERVER_API"
+---
+
 # API signaling-сервера
 
 Адрес: `ws://<host>:35500/` (или `wss://`). Сообщения — JSON-объекты c полем `t` (тип).

@@ -1,3 +1,8 @@
+---
+layout: default
+title: "RUNNING"
+---
+
 # Запуск для игроков
 
 ## Что нужно

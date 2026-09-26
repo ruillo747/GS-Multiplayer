@@ -1,18 +1,19 @@
 package com.gsmultiplayer.client.gui;
 
+import com.gsmultiplayer.client.GsText;
 import com.gsmultiplayer.room.RoomManager;
-import com.gsmultiplayer.util.GsLog;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 
 import java.util.List;
-import com.gsmultiplayer.client.GsText;
 
 /** Shown while joining a room: negotiation, punching or relay fallback in progress. */
 public final class ConnectingScreen extends GsBaseScreen {
 
     private long openedAt = System.currentTimeMillis();
+    private RoomManager.Phase lastPhase;
 
     public ConnectingScreen(Screen parent) {
         super(GsText.t("gs.multiplayer.connecting_title"), parent);
@@ -28,11 +29,22 @@ public final class ConnectingScreen extends GsBaseScreen {
     }
 
     @Override
+    public void tick() {
+        // Close automatically once the join attempt is over: errors are already
+        // reported as a toast/chat message, no reason to keep this screen up.
+        RoomManager.Phase phase = mod().rooms().getPhase();
+        if (lastPhase != null && lastPhase != RoomManager.Phase.IDLE && phase == RoomManager.Phase.IDLE) {
+            onClose();
+            return;
+        }
+        lastPhase = phase;
+    }
+
+    @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
         int cx = this.width / 2;
-        RoomManager rooms = mod().rooms();
-        RoomManager.Phase phase = rooms.getPhase();
+        RoomManager.Phase phase = mod().rooms().getPhase();
 
         String statusKey;
         if (phase == RoomManager.Phase.CONNECTED) {
@@ -44,7 +56,6 @@ public final class ConnectingScreen extends GsBaseScreen {
         }
         drawCentered(matrices, GsText.t(statusKey), cx, this.height / 4 + 10, 0xFFFF55);
 
-        // animated dots
         long dots = (System.currentTimeMillis() - openedAt) / 400 % 4;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < dots; i++) {
@@ -52,7 +63,7 @@ public final class ConnectingScreen extends GsBaseScreen {
         }
         drawCentered(matrices, sb.toString(), cx, this.height / 4 + 22, 0xFFFF55);
 
-        List<String> log = GsLog.recent(5);
+        List<String> log = com.gsmultiplayer.util.GsLog.recent(5);
         int y = this.height / 4 + 44;
         for (String line : log) {
             drawCentered(matrices, line, cx, y, 0x707070);

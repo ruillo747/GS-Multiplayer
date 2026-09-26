@@ -78,6 +78,7 @@ public final class SettingsScreen extends GsBaseScreen {
 
     private void save() {
         GsConfig config = ConfigManager.get();
+        String previousUrl = config.signalingUrl;
         config.user.nickname = nicknameField.getText().trim();
         String url = signalingField.getText().trim();
         if (url.startsWith("ws://") || url.startsWith("wss://")) {
@@ -92,6 +93,9 @@ public final class SettingsScreen extends GsBaseScreen {
         config.ui.showPauseButton = pauseButtonBox.isChecked();
         ConfigManager.save();
         mod().applySettings();
+        if (!previousUrl.equals(config.signalingUrl)) {
+            mod().rooms().reconnectSignaling();
+        }
         client.openScreen(parent);
     }
 
@@ -112,10 +116,17 @@ public final class SettingsScreen extends GsBaseScreen {
         super.render(matrices, mouseX, mouseY, delta);
         int cx = this.width / 2;
         int y = this.height / 4 - 6;
-        drawLeft(matrices, GsText.t("gs.multiplayer.relay_port").getString(), cx + 104, y + 46, 0x808080);
-        drawLeft(matrices, GsText.t("gs.multiplayer.lan_port").getString(), cx + 104, y + 72, 0x808080);
+        label(matrices, cx - 100, y - 11, "gs.multiplayer.nickname");
+        label(matrices, cx - 100, y + 15, "gs.multiplayer.signaling_url");
+        label(matrices, cx - 100, y + 41, "gs.multiplayer.relay_host");
+        label(matrices, cx + 104, y + 41, "gs.multiplayer.relay_port");
+        label(matrices, cx + 104, y + 67, "gs.multiplayer.lan_port");
         drawCentered(matrices, GsText.t("gs.multiplayer.your_id",
                 ConfigManager.get().user.gsId), cx, y + 182, 0xA0A0A0);
+    }
+
+    private void label(MatrixStack matrices, int x, int y, String key) {
+        drawLeft(matrices, GsText.t(key).getString(), x, y, 0x9090B0);
     }
 
     @Override

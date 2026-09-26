@@ -1,3 +1,8 @@
+---
+layout: default
+title: "DEPLOY"
+---
+
 # Развёртывание signaling/relay-сервера
 
 Сервер GS Multiplayer — два процесса без состояния:
@@ -8,6 +13,19 @@
 | `relay/index.js` | 35501 UDP | свой бинарный | ретрансляция игровых пакетов при провале P2P |
 
 Требования: любой VPS (512 МБ RAM достаточно), Node.js ≥ 16, открытые порты 35500/TCP и 35501/UDP.
+
+## Render (бесплатно, без VPS)
+
+Signaling можно развернуть бесплатно на [Render](https://render.com) — в репозитории есть blueprint:
+
+1. Нажмите кнопку **Deploy to Render** на [сайте проекта](https://ruillo747.github.io/GS-Multiplayer/deploy.html)
+   или создайте "New → Blueprint" и укажите этот репозиторий (файл `render.yaml`).
+2. Render соберёт и запустит signaling; UDP-relay на бесплатном тарифе недоступен —
+   мод при этом работает по прямому P2P, резервный relay можно добавить позже на VPS.
+3. Адрес вида `wss://gs-signaling-xxxx.onrender.com` впишите в настройках мода.
+   Free-инстанс засыпает без трафика; первый запрос после сна отвечает ~30 секунд.
+
+Проверить сервер: [страница статуса](https://ruillo747.github.io/GS-Multiplayer/status.html).
 
 ## 1. Установка
 

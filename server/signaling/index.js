@@ -307,7 +307,11 @@ function sendError(session, of, code) {
 }
 
 function json(res, code, obj) {
-    res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.writeHead(code, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'no-store'
+    });
     res.end(JSON.stringify(obj));
 }
 

@@ -61,6 +61,8 @@ public final class GsMultiplayerClient implements ClientModInitializer {
                 GsMultiplayerMod.LOGGER.error("[gs] {}", (Object) entry.message);
             } else if (entry.level == GsLog.Level.WARN) {
                 GsMultiplayerMod.LOGGER.warn("[gs] {}", (Object) entry.message);
+            } else if (entry.level == GsLog.Level.DEBUG) {
+                GsMultiplayerMod.LOGGER.debug("[gs] {}", (Object) entry.message);
             } else {
                 GsMultiplayerMod.LOGGER.info("[gs] {}", (Object) entry.message);
             }

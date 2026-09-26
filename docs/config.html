@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Генератор конфига — GS Multiplayer</title>
+<style>
+  body { font-family: "Segoe UI", Roboto, sans-serif; margin: 0; background: #14162b; color: #e8eaf6; }
+  .wrap { max-width: 680px; margin: 40px auto; padding: 0 16px; }
+  a.back { color: #9fb4ff; text-decoration: none; font-size: 14px; }
+  h1 { font-size: 26px; margin: 12px 0 6px; }
+  p.sub { color: #8f9bd4; margin-top: 0; }
+  .card { background: #1d2040; border-radius: 12px; padding: 20px 22px; margin: 18px 0; }
+  label { display: block; font-size: 13px; color: #8f9bd4; margin: 12px 0 5px; }
+  label:first-child { margin-top: 0; }
+  input, select { width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 8px;
+          border: 1px solid #3a3f7a; background: #14162b; color: #e8eaf6; font-size: 14px; }
+  .row { display: flex; gap: 12px; }
+  .row > div { flex: 1; }
+  pre { background: #0d0f1f; border: 1px solid #2a2e5a; border-radius: 10px; padding: 16px;
+        font-size: 13px; overflow-x: auto; line-height: 1.55; }
+  button { margin: 10px 8px 0 0; padding: 10px 18px; border-radius: 8px; border: 0; cursor: pointer;
+           background: #4c6ef5; color: white; font-size: 14px; font-weight: 600; }
+  button.gray { background: #3a3f7a; }
+  button:hover { filter: brightness(1.1); }
+  .note { font-size: 12.5px; color: #7f8ac9; margin-top: 12px; line-height: 1.6; }
+  code { background: #14162b; padding: 2px 6px; border-radius: 5px; font-size: 13px; color: #9fb4ff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← GS Multiplayer</a>
+  <h1>Генератор конфига мода</h1>
+  <p class="sub">Заполните поля — получите готовый <code>config/gsmultiplayer.json</code>.</p>
+
+  <div class="card">
+    <label>Никнейм в GS Multiplayer (пусто = ник Minecraft)</label>
+    <input id="nick" placeholder="Steve" maxlength="24">
+
+    <label>Signaling-сервер</label>
+    <input id="url" placeholder="ws://203.0.113.10:35500" spellcheck="false">
+
+    <label>Relay (обычно пусто — адрес выдаёт signaling-сервер)</label>
+    <div class="row">
+      <div><input id="relayHost" placeholder="хост (необязательно)"></div>
+      <div style="max-width:140px"><input id="relayPort" placeholder="35501" inputmode="numeric"></div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Кнопка в главном меню</label>
+        <select id="titleBtn"><option value="true">Показывать</option><option value="false">Скрыть</option></select>
+      </div>
+      <div>
+        <label>Режим разработчика (диагностика)</label>
+        <select id="devMode"><option value="false">Выключен</option><option value="true">Включён</option></select>
+      </div>
+    </div>
+
+    <button onclick="generate()">Сформировать</button>
+    <button class="gray" onclick="downloadCfg()">Скачать файл</button>
+    <div id="out"></div>
+    <div class="note">
+      Файл кладётся в <code>.minecraft/config/gsmultiplayer.json</code>
+      (в Modrinth App: инстанс → Open Folder → <code>.minecraft/config/</code>).
+      Мод создаёт этот файл сам при первом запуске — генератор нужен, чтобы сразу
+      указать рабочий сервер и не лезть в настройки игры.
+    </div>
+  </div>
+</div>
+<script>
+let current = '';
+function generate() {
+  const v = (id) => document.getElementById(id).value.trim();
+  const cfg = {
+    signalingUrl: v('url') || 'ws://localhost:35500',
+    relayHost: v('relayHost'),
+    relayPort: parseInt(v('relayPort'), 10) || 35501,
+    connection: { punchTimeoutMs: 6000, signalingTimeoutMs: 10000, pingIntervalMs: 4000, lanPort: 25575 },
+    user: { nickname: v('nick'), gsId: '' },
+    ui: { showTitleButton: document.getElementById('titleBtn').value === 'true', showPauseButton: true },
+    updates: { enabled: true, checkOnStartup: true, repoOwner: 'ruillo747', repoName: 'GS-Multiplayer' },
+    diagnostics: { devMode: document.getElementById('devMode').value === 'true', verboseNetwork: false, logLines: 500 }
+  };
+  current = JSON.stringify(cfg, null, 2);
+  document.getElementById('out').innerHTML =
+    '<pre>' + current.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</pre>';
+}
+function downloadCfg() {
+  if (!current) { generate(); }
+  const blob = new Blob([current], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'gsmultiplayer.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+</script>
+</body>
+</html>

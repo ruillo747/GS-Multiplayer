@@ -40,17 +40,23 @@ public final class GsMainScreen extends GsBaseScreen {
 
         // Pending invitation: one at a time, most recent first.
         GsMultiplayerClient mod = mod();
-        if (mod != null) {
+        if (mod != null && this.height >= 300) {
             java.util.List<Invite> invites = mod.rooms().getInvites();
             if (!invites.isEmpty()) {
                 Invite invite = invites.get(invites.size() - 1);
                 int iy = y + 128;
                 addButton(new ButtonWidget(cx - 100, iy, 130, 20,
                         GsText.t("gs.multiplayer.invite_from", invite.fromName),
-                        b -> quiet(() -> mod.rooms().respondToInvite(invite, true))));
+                        b -> quiet(() -> {
+                            mod.rooms().respondToInvite(invite, true);
+                            this.init(this.client, this.width, this.height); // drop answered row immediately
+                        })));
                 addButton(new ButtonWidget(cx + 34, iy, 66, 20,
                         GsText.t("gs.multiplayer.decline"),
-                        b -> quiet(() -> mod.rooms().respondToInvite(invite, false))));
+                        b -> quiet(() -> {
+                            mod.rooms().respondToInvite(invite, false);
+                            this.init(this.client, this.width, this.height);
+                        })));
             }
         }
 
@@ -96,11 +102,24 @@ public final class GsMainScreen extends GsBaseScreen {
         }
     }
 
+    private int lastInviteCount = -1;
+    private boolean lastUpdateSeen;
+
     @Override
     public void tick() {
-        // refresh invitation/update rows occasionally
-        if (this.client != null && (this.client.world == null)) {
-            // cheap no-op; init() is re-run when returning from child screens
+        // Rebuild rows only when something actually changed (invite answered,
+        // update check finished) - rebuilding every tick would flicker.
+        GsMultiplayerClient mod = mod();
+        if (mod == null || this.client == null) {
+            return;
+        }
+        int invites = mod.rooms().getInvites().size();
+        boolean updateSeen = mod.updates().getResult().status
+                != com.gsmultiplayer.update.UpdateChecker.Status.CHECKING;
+        if (invites != lastInviteCount || updateSeen != lastUpdateSeen) {
+            lastInviteCount = invites;
+            lastUpdateSeen = updateSeen;
+            this.init(this.client, this.width, this.height);
         }
     }
 }

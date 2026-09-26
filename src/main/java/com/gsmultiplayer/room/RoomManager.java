@@ -172,6 +172,14 @@ public final class RoomManager {
         worker.execute(this::openSignalingQuietly);
     }
 
+    /** Drops the current signaling session and connects again (used after settings change). */
+    public void reconnectSignaling() {
+        worker.execute(() -> {
+            signaling.close();
+            openSignalingQuietly();
+        });
+    }
+
     public Phase getPhase() {
         return phase;
     }
