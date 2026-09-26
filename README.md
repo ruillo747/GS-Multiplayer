@@ -55,7 +55,7 @@ Minecraft Java 1.16.5
 Подойдёт любой VPS с Node.js ≥ 16:
 
 ```bash
-git clone https://github.com/your-username/GS-Multiplayer.git
+git clone https://github.com/ruillo747/GS-Multiplayer.git
 cd GS-Multiplayer/server
 npm install
 cp .env.example .env      # укажите RELAY_PUBLIC_HOST и RELAY_SECRET

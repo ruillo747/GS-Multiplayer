@@ -9,7 +9,7 @@
 ## Сборка мода
 
 ```bash
-git clone https://github.com/your-username/GS-Multiplayer.git
+git clone https://github.com/ruillo747/GS-Multiplayer.git
 cd GS-Multiplayer
 ./gradlew build
 ```

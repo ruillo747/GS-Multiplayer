@@ -47,7 +47,7 @@ public final class UpdateChecker {
     public void checkAsync(String repoOwner, String repoName, String currentVersion) {
         if (repoOwner == null || repoName == null
                 || repoOwner.isEmpty() || repoName.isEmpty()
-                || "your-username".equals(repoOwner) || "example".equalsIgnoreCase(repoOwner)) {
+                || "example".equalsIgnoreCase(repoOwner)) {
             result = new Result(Status.ERROR, null, null, null, "repo not configured");
             return;
         }

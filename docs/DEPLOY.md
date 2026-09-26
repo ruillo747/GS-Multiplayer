@@ -17,7 +17,7 @@ curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 cd /opt
-sudo git clone https://github.com/your-username/GS-Multiplayer.git gs
+sudo git clone https://github.com/ruillo747/GS-Multiplayer.git gs
 cd gs/server
 sudo npm install --omit=dev
 ```

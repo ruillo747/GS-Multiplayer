@@ -47,8 +47,8 @@ public class GsConfig {
     public static class Updates {
         public boolean enabled = true;
         public boolean checkOnStartup = true;
-        /** GitHub repository that publishes releases, e.g. "your-username/GS-Multiplayer". */
-        public String repoOwner = "your-username";
+        /** GitHub repository that publishes releases, e.g. "ruillo747/GS-Multiplayer". */
+        public String repoOwner = "ruillo747";
         public String repoName = "GS-Multiplayer";
     }
 
