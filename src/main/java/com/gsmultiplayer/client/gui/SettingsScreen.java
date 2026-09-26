@@ -10,6 +10,7 @@ import net.minecraft.client.util.math.MatrixStack;
 
 import java.util.Locale;
 import com.gsmultiplayer.client.GsText;
+import com.gsmultiplayer.client.GuiUtil;
 
 /** Local settings: identity, server addresses, connection, UI, diagnostics. */
 public final class SettingsScreen extends GsBaseScreen {
@@ -22,6 +23,7 @@ public final class SettingsScreen extends GsBaseScreen {
     private CheckboxWidget devModeBox;
     private CheckboxWidget updatesBox;
     private CheckboxWidget titleButtonBox;
+    private CheckboxWidget upnpBox;
 
     public SettingsScreen(Screen parent) {
         super(GsText.t("gs.multiplayer.settings_title"), parent);
@@ -52,15 +54,24 @@ public final class SettingsScreen extends GsBaseScreen {
         addButton(lanPortField);
 
         // Compact column: the whole screen must fit 240 GUI units (scale-2 windowed mode).
-        devModeBox = addButton(new CheckboxWidget(cx - 100, y + 80, 200, 20,
+        devModeBox = addButton(new CheckboxWidget(cx - 100, y + 76, 200, 20,
                 GsText.t("gs.multiplayer.dev_mode"), config.diagnostics.devMode));
-        updatesBox = addButton(new CheckboxWidget(cx - 100, y + 102, 200, 20,
+        updatesBox = addButton(new CheckboxWidget(cx - 100, y + 96, 200, 20,
                 GsText.t("gs.multiplayer.update_check"), config.updates.enabled));
-        titleButtonBox = addButton(new CheckboxWidget(cx - 100, y + 124, 200, 20,
+        titleButtonBox = addButton(new CheckboxWidget(cx - 100, y + 116, 200, 20,
                 GsText.t("gs.multiplayer.title_button"), config.ui.showTitleButton));
+        upnpBox = addButton(new CheckboxWidget(cx - 100, y + 136, 200, 20,
+                GsText.t("gs.multiplayer.settings_upnp"), config.connection.autoPortMap));
 
-        addButton(new ButtonWidget(cx - 100, y + 150, 200, 20,
+        addButton(new ButtonWidget(cx - 100, y + 158, 98, 20,
                 GsText.t("gs.multiplayer.save"), b -> save()));
+        addButton(new ButtonWidget(cx + 2, y + 158, 98, 20,
+                GsText.t("gs.multiplayer.firewall"), b -> {
+            boolean ok = com.gsmultiplayer.util.FirewallFix.recreateRules();
+            GuiUtil.toast(client, GsText.t("gs.multiplayer.title"),
+                    GsText.t(ok ? "gs.multiplayer.firewall_done"
+                            : "gs.multiplayer.firewall_unavailable"));
+        }));
         // Esc closes the screen without saving - no extra Back button needed.
     }
 
@@ -87,6 +98,7 @@ public final class SettingsScreen extends GsBaseScreen {
         config.diagnostics.devMode = devModeBox.isChecked();
         config.updates.enabled = updatesBox.isChecked();
         config.ui.showTitleButton = titleButtonBox.isChecked();
+        config.connection.autoPortMap = upnpBox.isChecked();
         ConfigManager.save();
         mod().applySettings();
         if (!previousUrl.equals(config.signalingUrl)) {
@@ -118,9 +130,7 @@ public final class SettingsScreen extends GsBaseScreen {
         label(matrices, cx + 104, y + 41, "gs.multiplayer.relay_port");
         label(matrices, cx + 104, y + 67, "gs.multiplayer.lan_port");
         drawLeft(matrices, GsText.t("gs.multiplayer.esc_hint").getString(),
-                cx - 100, y + 174, 0x606080);
-        drawCentered(matrices, GsText.t("gs.multiplayer.your_id",
-                ConfigManager.get().user.gsId), cx, y + 186, 0xA0A0A0);
+                cx - 100, y + 178, 0x606080);
     }
 
     private void label(MatrixStack matrices, int x, int y, String key) {

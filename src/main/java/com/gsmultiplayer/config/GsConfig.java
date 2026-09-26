@@ -30,6 +30,9 @@ public class GsConfig {
         public int pingIntervalMs = 4000;
         /** TCP port used when publishing the integrated server for the room. */
         public int lanPort = 25575;
+
+        /** Try to open the LAN port on the router automatically (UPnP/NAT-PMP/PCP). */
+        public boolean autoPortMap = true;
     }
 
     public static class User {

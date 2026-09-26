@@ -76,7 +76,7 @@ function generate() {
     signalingUrl: v('url') || 'ws://localhost:35500',
     relayHost: v('relayHost'),
     relayPort: parseInt(v('relayPort'), 10) || 35501,
-    connection: { punchTimeoutMs: 6000, signalingTimeoutMs: 10000, pingIntervalMs: 4000, lanPort: 25575 },
+    connection: { punchTimeoutMs: 6000, signalingTimeoutMs: 10000, pingIntervalMs: 4000, lanPort: 25575, autoPortMap: true },
     user: { nickname: v('nick'), gsId: '' },
     ui: { showTitleButton: document.getElementById('titleBtn').value === 'true', showPauseButton: true },
     updates: { enabled: true, checkOnStartup: true, repoOwner: 'ruillo747', repoName: 'GS-Multiplayer' },

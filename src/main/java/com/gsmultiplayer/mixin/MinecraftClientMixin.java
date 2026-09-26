@@ -30,5 +30,6 @@ public abstract class MinecraftClientMixin {
         if (rooms != null && rooms.getPhase() != RoomManager.Phase.IDLE) {
             rooms.leaveRoom();
         }
+        com.gsmultiplayer.network.portmap.PortMapService.get().unmap();
     }
 }

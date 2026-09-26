@@ -23,37 +23,74 @@ public final class GsMainScreen extends GsBaseScreen {
     protected void init() {
         int cx = this.width / 2;
         boolean compact = this.height < 320;   // e.g. 854x480 windowed at scale 2
-        int y = compact ? 46 : this.height / 4;
-        int step = compact ? 24 : 24;
-        int bottom = compact ? y + 5 * step + 20 : this.height - 28;
+        int actionY;
+        int doneY;
+        int inviteY;
+        if (compact) {
+            // 2-column grid: the whole menu must fit 240 GUI units
+            int y0 = 48;
+            addButton(new ButtonWidget(cx - 100, y0, 98, 20,
+                    GsText.t("gs.multiplayer.browse"), b -> client.openScreen(new RoomBrowserScreen(this))));
+            addButton(new ButtonWidget(cx + 2, y0, 98, 20,
+                    GsText.t("gs.multiplayer.join_by_code"), b -> client.openScreen(new JoinByCodeScreen(this))));
+            addButton(new ButtonWidget(cx - 100, y0 + 22, 98, 20,
+                    GsText.t("gs.multiplayer.join_by_ip"), b -> client.openScreen(new JoinByIpScreen(this))));
+            addButton(new ButtonWidget(cx + 2, y0 + 22, 98, 20,
+                    GsText.t("gs.multiplayer.friends"), b -> client.openScreen(new FriendsScreen(this))));
+            addButton(new ButtonWidget(cx - 100, y0 + 44, 98, 20,
+                    GsText.t("gs.multiplayer.settings"), b -> client.openScreen(new SettingsScreen(this))));
+            addButton(new ButtonWidget(cx + 2, y0 + 44, 98, 20,
+                    GsText.t("gs.multiplayer.diagnostics"), b -> client.openScreen(new DiagnosticsScreen(this))));
+            actionY = y0 + 66;
+            doneY = y0 + 90;
+            inviteY = y0 + 116;
+        } else {
+            int y = this.height / 4;
+            int step = 24;
+            String[] keys = {"gs.multiplayer.browse", "gs.multiplayer.join_by_code",
+                    "gs.multiplayer.join_by_ip", "gs.multiplayer.friends",
+                    "gs.multiplayer.settings", "gs.multiplayer.diagnostics"};
+            for (int i = 0; i < keys.length; i++) {
+                final int row = i;
+                addButton(new ButtonWidget(cx - 100, y + i * step, 200, 20,
+                        GsText.t(keys[i]), b -> openRow(row)));
+            }
+            actionY = y + keys.length * step;
+            doneY = this.height - 28;
+            inviteY = y + keys.length * step + 28;
+        }
 
-        addButton(new ButtonWidget(cx - 100, y, 200, 20,
-                GsText.t("gs.multiplayer.browse"), b -> client.openScreen(new RoomBrowserScreen(this))));
-        addButton(new ButtonWidget(cx - 100, y + step, 200, 20,
-                GsText.t("gs.multiplayer.join_by_code"), b -> client.openScreen(new JoinByCodeScreen(this))));
-        addButton(new ButtonWidget(cx - 100, y + 2 * step, 200, 20,
-                GsText.t("gs.multiplayer.friends"), b -> client.openScreen(new FriendsScreen(this))));
-        addButton(new ButtonWidget(cx - 100, y + 3 * step, 200, 20,
-                GsText.t("gs.multiplayer.settings"), b -> client.openScreen(new SettingsScreen(this))));
-        addButton(new ButtonWidget(cx - 100, y + 4 * step, 200, 20,
-                GsText.t("gs.multiplayer.diagnostics"), b -> client.openScreen(new DiagnosticsScreen(this))));
-        addButton(new ButtonWidget(cx - 100, bottom, 200, 20,
+        // Context action: disconnect when in a room, "open to network" in a world.
+        GsMultiplayerClient mod = mod();
+        boolean connected = mod != null && (mod.rooms().isHosting()
+                || mod.rooms().getPhase() == RoomManager.Phase.CONNECTED);
+        boolean inWorld = this.client != null && this.client.getServer() != null;
+        if (connected) {
+            addButton(new ButtonWidget(cx - 100, actionY, 200, 20,
+                    GsText.t("gs.multiplayer.disconnect"), b -> {
+                mod.rooms().leaveRoom();
+                this.init(this.client, this.width, this.height);
+            }));
+        } else if (inWorld) {
+            addButton(new ButtonWidget(cx - 100, actionY, 200, 20,
+                    GsText.t("gs.multiplayer.open_net_short"),
+                    b -> client.openScreen(new OpenToNetworkScreen(this))));
+        }
+        addButton(new ButtonWidget(cx - 100, doneY, 200, 20,
                 GsText.t("gui.done"), b -> onClose()));
 
         // Pending invitation: one at a time, most recent first.
-        GsMultiplayerClient mod = mod();
         if (mod != null && this.height >= 300) {
             java.util.List<Invite> invites = mod.rooms().getInvites();
             if (!invites.isEmpty()) {
                 Invite invite = invites.get(invites.size() - 1);
-                int iy = compact ? y + 118 : y + 128;
-                addButton(new ButtonWidget(cx - 100, iy, 130, 20,
+                addButton(new ButtonWidget(cx - 100, inviteY, 130, 20,
                         GsText.t("gs.multiplayer.invite_from", invite.fromName),
                         b -> quiet(() -> {
                             mod.rooms().respondToInvite(invite, true);
-                            this.init(this.client, this.width, this.height); // drop answered row immediately
+                            this.init(this.client, this.width, this.height);
                         })));
-                addButton(new ButtonWidget(cx + 34, iy, 66, 20,
+                addButton(new ButtonWidget(cx + 34, inviteY, 66, 20,
                         GsText.t("gs.multiplayer.decline"),
                         b -> quiet(() -> {
                             mod.rooms().respondToInvite(invite, false);
@@ -61,24 +98,28 @@ public final class GsMainScreen extends GsBaseScreen {
                         })));
             }
         }
+    }
 
-        // Update banner.
-        GsConfig config = com.gsmultiplayer.config.ConfigManager.get();
-        if (config.updates.enabled && mod != null) {
-            UpdateChecker.Result result = mod.updates().getResult();
-            if (result.status == UpdateChecker.Status.AVAILABLE) {
-                if (!compact) { // compact screens show the text line only (see render)
-                    int uy = bottom - 50;
-                    if (this.height >= 320) {
-                        addButton(new ButtonWidget(cx - 100, uy, 98, 20,
-                                GsText.t("gs.multiplayer.update_details"),
-                                b -> GuiUtil.openUrl(result.releaseUrl)));
-                        addButton(new ButtonWidget(cx + 2, uy, 98, 20,
-                                GsText.t("gs.multiplayer.update_download"),
-                                b -> GuiUtil.openUrl(result.jarUrl != null ? result.jarUrl : result.releaseUrl)));
-                    }
-                }
-            }
+    private void openRow(int row) {
+        switch (row) {
+            case 0:
+                client.openScreen(new RoomBrowserScreen(this));
+                break;
+            case 1:
+                client.openScreen(new JoinByCodeScreen(this));
+                break;
+            case 2:
+                client.openScreen(new JoinByIpScreen(this));
+                break;
+            case 3:
+                client.openScreen(new FriendsScreen(this));
+                break;
+            case 4:
+                client.openScreen(new SettingsScreen(this));
+                break;
+            default:
+                client.openScreen(new DiagnosticsScreen(this));
+                break;
         }
     }
 
@@ -96,8 +137,8 @@ public final class GsMainScreen extends GsBaseScreen {
             return;
         }
         RoomManager rooms = mod.rooms();
-        boolean compactLayout = this.height < 320;
-        int y = compactLayout ? 16 : this.height / 4 - 26;
+        boolean compact = this.height < 320;
+        int y = compact ? 16 : this.height / 4 - 26;
         int color = rooms.isSignalingOnline() ? 0x55FF55 : 0xFF5555;
         drawCentered(matrices, GsText.t(rooms.isSignalingOnline()
                 ? "gs.multiplayer.status_online" : "gs.multiplayer.status_offline"), cx, y, color);
@@ -107,11 +148,10 @@ public final class GsMainScreen extends GsBaseScreen {
         UpdateChecker.Result result = mod.updates().getResult();
         if (result.status == UpdateChecker.Status.AVAILABLE) {
             boolean invitePending = !mod.rooms().getInvites().isEmpty();
-            if (compactLayout) {
-                // 46 = compact button-stack origin; the free line sits below it.
+            if (compact) {
                 if (!invitePending) {
                     drawCentered(matrices, GsText.t("gs.multiplayer.update_available", result.latestVersion),
-                            cx, 168, 0xFFFF55);
+                            cx, 190, 0xFFFF55);
                 }
             } else {
                 drawCentered(matrices, GsText.t("gs.multiplayer.update_available", result.latestVersion),
