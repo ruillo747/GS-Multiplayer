@@ -36,8 +36,5 @@ public abstract class TitleScreenMixin {
                 self.width / 2 - 100, y + 16, 200, 20,
                 GsText.t("gs.multiplayer.title"),
                 button -> client.openScreen(new GsMainScreen(null))));
-        if (GsMultiplayerClient.get() != null) {
-            GsMultiplayerClient.get().rooms().connectToSignaling();
-        }
     }
 }

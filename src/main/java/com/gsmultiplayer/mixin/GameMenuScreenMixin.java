@@ -1,8 +1,6 @@
 package com.gsmultiplayer.mixin;
 
 import com.gsmultiplayer.client.GsMultiplayerClient;
-import com.gsmultiplayer.client.gui.HostActiveScreen;
-import com.gsmultiplayer.client.gui.HostSetupScreen;
 import com.gsmultiplayer.config.ConfigManager;
 import com.gsmultiplayer.util.GsLog;
 import net.minecraft.client.MinecraftClient;
@@ -35,13 +33,6 @@ public abstract class GameMenuScreenMixin {
         ((ScreenAddButtonInvoker) self).gsmultiplayer$addButton(new ButtonWidget(
                 self.width / 2 - 100, self.height / 4 + 120 + 8, 200, 20,
                 GsText.t("gs.multiplayer.title"),
-                button -> {
-                    GsMultiplayerClient mod = GsMultiplayerClient.get();
-                    if (mod != null && mod.rooms().isHosting()) {
-                        client.openScreen(new HostActiveScreen(self));
-                    } else {
-                        client.openScreen(new HostSetupScreen(self));
-                    }
-                }));
+                button -> client.openScreen(new com.gsmultiplayer.client.gui.OpenToNetworkScreen(self))));
     }
 }

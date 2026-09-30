@@ -1,6 +1,5 @@
 package com.gsmultiplayer.config;
 
-import com.gsmultiplayer.security.Codes;
 import com.gsmultiplayer.util.GsLog;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -13,16 +12,12 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 
-/**
- * Loads and saves config/gsmultiplayer.json. Also owns the local data directory
- * config/gsmultiplayer/ (friends list and other per-user data).
- */
+/** Loads and saves config/gsmultiplayer.json. */
 public final class ConfigManager {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private static Path configFile;
-    private static Path dataDir;
     private static GsConfig config;
 
     private ConfigManager() {
@@ -30,15 +25,8 @@ public final class ConfigManager {
 
     public static synchronized void init(Path gameDir) {
         configFile = gameDir.resolve("config").resolve("gsmultiplayer.json");
-        dataDir = gameDir.resolve("config").resolve("gsmultiplayer");
         config = load();
-        boolean dirty = fillDefaults(config);
-        if (config.user.gsId == null || config.user.gsId.isEmpty()) {
-            config.user.gsId = Codes.generateGsId();
-            GsLog.info("Generated new GS ID: " + config.user.gsId);
-            dirty = true;
-        }
-        if (dirty) {
+        if (fillDefaults(config)) {
             save();
         }
         GsLog.info("Config loaded");
@@ -50,17 +38,6 @@ public final class ConfigManager {
             fillDefaults(config);
         }
         return config;
-    }
-
-    public static synchronized Path dataDir() {
-        if (dataDir == null) {
-            try {
-                dataDir = Files.createTempDirectory("gsmultiplayer");
-            } catch (IOException e) {
-                throw new IllegalStateException("No data directory", e);
-            }
-        }
-        return dataDir;
     }
 
     public static synchronized void save() {
@@ -104,10 +81,6 @@ public final class ConfigManager {
             c.connection = new GsConfig.Connection();
             changed = true;
         }
-        if (c.user == null) {
-            c.user = new GsConfig.User();
-            changed = true;
-        }
         if (c.ui == null) {
             c.ui = new GsConfig.Ui();
             changed = true;
@@ -120,15 +93,12 @@ public final class ConfigManager {
             c.diagnostics = new GsConfig.Diagnostics();
             changed = true;
         }
-        changed |= clamp(v -> c.connection.punchTimeoutMs = v, c.connection.punchTimeoutMs, 6000, 1000, 30000);
-        changed |= clamp(v -> c.connection.signalingTimeoutMs = v, c.connection.signalingTimeoutMs, 10000, 1000, 60000);
-        changed |= clamp(v -> c.connection.pingIntervalMs = v, c.connection.pingIntervalMs, 4000, 1000, 30000);
-        changed |= clamp(v -> c.connection.lanPort = v, c.connection.lanPort, 25575, 1024, 65535);
-        changed |= clamp(v -> c.diagnostics.logLines = v, c.diagnostics.logLines, 500, 100, 5000);
-        if (c.signalingUrl == null) {
-            c.signalingUrl = "ws://localhost:35500";
+        if (c.recentAddresses == null) {
+            c.recentAddresses = new java.util.ArrayList<>();
             changed = true;
         }
+        changed |= clamp(v -> c.connection.lanPort = v, c.connection.lanPort, 25575, 1024, 65535);
+        changed |= clamp(v -> c.diagnostics.logLines = v, c.diagnostics.logLines, 500, 100, 5000);
         return changed;
     }
 

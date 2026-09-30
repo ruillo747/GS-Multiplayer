@@ -1,52 +1,47 @@
 ---
-layout: default
-title: GS Multiplayer
+title: GS Multiplayer — мод для игры с друзьями по IP
+permalink: /
 ---
 
-# 🎮 GS Multiplayer
+# GS Multiplayer
 
-**Играйте в обычный одиночный мир Minecraft Java 1.16.5 с друзьями через интернет.**
-P2P-соединение напрямую (быстро), relay как резерв. Без своего сервера Minecraft. До 4 игроков.
+**Играйте с друзьями по интернету в обычный одиночный мир Minecraft 1.16.5 — без серверов, оплат и настроек.**
 
-[⬇ Скачать мод (Releases)](https://github.com/ruillo747/GS-Multiplayer/releases/latest){: .btn .btn-primary}
-[🚀 Развернуть signaling-сервер](deploy.md){: .btn}
-[🛠 Проверить статус сервера](status.html){: .btn}
-[⚙ Сгенерировать конфиг](config.html){: .btn}
+Тип подключения — **IP:порт** (как в Open2Online / e4mc):
 
-## Быстрый старт
-
-1. Установите [Fabric Loader](https://fabricmc.net/use/installer/) для Minecraft **1.16.5** (Java 8–17).
-2. Скачайте `gsmultiplayer-<версия>.jar` со страницы [Releases](https://github.com/ruillo747/GS-Multiplayer/releases/latest) и положите в `mods`.
-3. Запустите игру — кнопка **GS Multiplayer** появится в главном меню.
-4. Хост: **Одиночная игра → Esc → GS Multiplayer → Открыть комнату**. Друг: **Подключиться по коду**.
-
-## Сервер (signaling)
-
-Для игры через интернет нужен небольшой signaling-сервер (Node.js, 512 МБ RAM хватит):
-
-```bash
-git clone https://github.com/ruillo747/GS-Multiplayer.git && cd GS-Multiplayer/server
-npm install && cp .env.example .env   # укажите RELAY_PUBLIC_HOST и RELAY_SECRET
-node signaling/index.js               # порт 35500 TCP (WebSocket)
-node relay/index.js                   # порт 35501 UDP (relay, опционально)
+```
+Хост:  Esc → GS Multiplayer → Открыть в сеть → Открыть
+       → адрес IP:порт в чате и в буфере обмена
+Друг:  Сетевая игра → Прямое подключение → вставить адрес → играть
 ```
 
-Дальше: [инструкция по развёртыванию](DEPLOY.md) · [бесплатный деплой на Render](deploy.md#render) ·
-[API сервера](SERVER_API.md) · [сетевые протоколы](PROTOCOL.md)
+- Соединительный сервер **не нужен вообще** — мод сам пробрасывает порт на роутере (UPnP/NAT-PMP/PCP)
+- Сам определяет внешний IP (STUN + HTTPS-резерв) и пишет в чат оба адреса: для интернета и для Wi-Fi
+- Другу **не нужен мод** — обычное «Прямое подключение» Minecraft
+- Опция «Разрешить друзьям без лицензии»
+- Быстрое подключение в меню с историей адресов
+- RU + EN автоматически
 
-После развёртывания впишите адрес в игре: **GS Multiplayer → Настройки → Signaling-сервер** → `ws://ваш-сервер:35500`.
-Готовый конфиг можно сгенерировать на странице [конфига](config.html).
+<div class="buttons">
+<a class="btn" href="https://github.com/ruillo747/GS-Multiplayer/releases/latest">Скачать последний релиз</a>
+<a class="btn" href="https://github.com/ruillo747/GS-Multiplayer">Исходники на GitHub</a>
+</div>
+
+Дальше: [инструкция для игроков](RUNNING.md) · [сборка из исходников](BUILDING.md)
+
+## Как играть за 60 секунд
+
+1. Скачайте релиз и положите jar в папку `mods` (нужен Fabric Loader; Java 17).
+2. Зайдите в свой одиночный мир.
+3. Нажмите **Esc → GS Multiplayer → Открыть в сеть → Открыть**.
+4. Отправьте адрес другу (он уже в буфере обмена) — друг вставляет его в «Прямое подключение».
 
 ## Документация
 
 | Документ | О чём |
 |---|---|
-| [Запуск для игроков](RUNNING.md) | установка, комнаты, друзья, диагностика |
-| [Сборка из исходников](BUILDING.md) | Gradle, тесты, релизы |
-| [Развёртывание сервера](DEPLOY.md) | VPS, systemd, TLS/wss, файрвол |
-| [Деплой на Pterodactyl-панели](PTERODACTYL.md) | zertix.pw и любые Pterodactyl: загрузка, переменные, старт | 
-| [API signaling-сервера](SERVER_API.md) | протокол WebSocket, комнаты, presence |
-| [Сетевые протоколы](PROTOCOL.md) | P2P, NAT punch, relay, надёжный канал |
+| [Запуск для игроков](RUNNING.md) | установка, открытие мира, подключение, решение проблем |
+| [Сборка из исходников](BUILDING.md) | gradle, JDK 17 |
 
 ## Исходники
 

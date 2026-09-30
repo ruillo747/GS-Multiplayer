@@ -1,7 +1,6 @@
 package com.gsmultiplayer.mixin;
 
 import com.gsmultiplayer.client.GsMultiplayerClient;
-import com.gsmultiplayer.room.RoomManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,10 +24,6 @@ public abstract class MinecraftClientMixin {
         GsMultiplayerClient mod = GsMultiplayerClient.get();
         if (mod == null) {
             return;
-        }
-        RoomManager rooms = mod.rooms();
-        if (rooms != null && rooms.getPhase() != RoomManager.Phase.IDLE) {
-            rooms.leaveRoom();
         }
         com.gsmultiplayer.network.portmap.PortMapService.get().unmap();
     }

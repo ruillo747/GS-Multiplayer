@@ -37,7 +37,7 @@ public final class StunResolver {
             try {
                 InetSocketAddress result = query(server[0], Integer.parseInt(server[1]), socket, timeoutPerServerMs);
                 if (result != null) {
-                    GsLog.info("STUN: external address " + Candidate.encode(result) + " via " + server[0]);
+                    GsLog.info("STUN: external address " + result.getAddress().getHostAddress() + " via " + server[0]);
                     return result;
                 }
             } catch (Exception e) {
