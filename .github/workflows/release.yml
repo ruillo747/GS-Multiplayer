@@ -52,12 +52,6 @@ jobs:
       - name: Build mod
         run: ./gradlew build --no-daemon --stacktrace
 
-      - name: Server tests
-        run: |
-          cd server
-          npm install --no-audit --no-fund
-          npm test
-
       - name: Prepare release notes
         run: |
           VERSION="${{ steps.version.outputs.tag }}"
@@ -69,9 +63,9 @@ jobs:
             echo "2. Drop \`gsmultiplayer-$VERSION.jar\` into \`.minecraft/mods/\`"
             echo "3. Launch the game with the Fabric profile"
             echo ""
-            echo "### Server"
-            echo "The signaling/relay server is optional for a quick test and required for playing over the internet."
-            echo "See [docs/DEPLOY.md](https://github.com/${{ github.repository }}/blob/main/docs/DEPLOY.md)."
+            echo "### How to play"
+            echo "Host: open your world, press Esc, click the GS Multiplayer button, click Open - the address appears in chat and the clipboard."
+            echo "Friend: Minecraft - Multiplayer - Direct Connect - paste the address. No mod needed on the joining side."
           } > RELEASE_NOTES.md
 
       - name: Create GitHub Release

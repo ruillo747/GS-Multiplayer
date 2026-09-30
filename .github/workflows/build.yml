@@ -28,15 +28,6 @@ jobs:
       - name: Build mod
         run: ./gradlew build --no-daemon --stacktrace
 
-      - name: Server syntax check
-        run: node --check server/signaling/index.js && node --check server/relay/index.js
-
-      - name: Server e2e tests
-        run: |
-          cd server
-          npm install --no-audit --no-fund
-          npm test
-
       - name: Upload mod jar
         uses: actions/upload-artifact@v4
         with:
