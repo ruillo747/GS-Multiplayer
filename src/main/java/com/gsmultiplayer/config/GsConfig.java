@@ -15,6 +15,9 @@ public class GsConfig {
     /** UDP port of the relay; used together with relayHost, or as fallback if the server omits it. */
     public int relayPort = 35501;
 
+    /** Last addresses joined by IP (most recent first, max 5). Powers the quick-join field. */
+    public java.util.List<String> recentAddresses = new java.util.ArrayList<>();
+
     public Connection connection = new Connection();
     public User user = new User();
     public Ui ui = new Ui();

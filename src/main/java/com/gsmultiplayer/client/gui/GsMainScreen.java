@@ -9,6 +9,7 @@ import com.gsmultiplayer.update.UpdateChecker;
 import com.gsmultiplayer.util.GsLog;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import com.gsmultiplayer.client.GsText;
 
@@ -26,6 +27,7 @@ public final class GsMainScreen extends GsBaseScreen {
         int actionY;
         int doneY;
         int inviteY;
+        int quickY;
         if (compact) {
             // 2-column grid: the whole menu must fit 240 GUI units.
             // 148-wide columns: long RU labels ("Подключиться по коду") must fit
@@ -42,9 +44,10 @@ public final class GsMainScreen extends GsBaseScreen {
                     GsText.t("gs.multiplayer.settings"), b -> client.openScreen(new SettingsScreen(this))));
             addButton(new ButtonWidget(cx + 2, y0 + 44, 148, 20,
                     GsText.t("gs.multiplayer.diagnostics"), b -> client.openScreen(new DiagnosticsScreen(this))));
-            actionY = y0 + 66;
-            doneY = y0 + 90;
-            inviteY = y0 + 116;
+            quickY = y0 + 66;
+            actionY = y0 + 90;
+            doneY = y0 + 114;
+            inviteY = y0 + 140;
         } else {
             int y = this.height / 4;
             int step = 24;
@@ -56,10 +59,25 @@ public final class GsMainScreen extends GsBaseScreen {
                 addButton(new ButtonWidget(cx - 100, y + i * step, 200, 20,
                         GsText.t(keys[i]), b -> openRow(row)));
             }
-            actionY = y + keys.length * step;
+            quickY = y + keys.length * step;
+            actionY = quickY + 24;
             doneY = this.height - 28;
-            inviteY = y + keys.length * step + 28;
+            inviteY = y + keys.length * step + 52;
         }
+
+        // Quick join: paste the address a friend sent, press one button.
+        java.util.List<String> recent = com.gsmultiplayer.config.ConfigManager.get().recentAddresses;
+        quickField = new TextFieldWidget(this.textRenderer, cx - 150, quickY, 148, 20,
+                GsText.t("gs.multiplayer.join_ip_hint"));
+        quickField.setMaxLength(255);
+        if (!recent.isEmpty()) {
+            quickField.setText(recent.get(0));
+        }
+        quickField.setChangedListener(s -> { });
+        addButton(quickField);
+        addButton(new ButtonWidget(cx + 2, quickY, 148, 20,
+                GsText.t("gs.multiplayer.join_button"), b -> quickJoin()));
+        setInitialFocus(quickField);
 
         // Context action: disconnect when in a room, "open to network" in a world.
         GsMultiplayerClient mod = mod();
@@ -124,6 +142,30 @@ public final class GsMainScreen extends GsBaseScreen {
         }
     }
 
+    private TextFieldWidget quickField;
+
+    private void quickJoin() {
+        String raw = quickField.getText().trim();
+        if (raw.isEmpty()) {
+            return;
+        }
+        String[] parts = com.gsmultiplayer.client.GuiUtil.splitAddress(raw, 25565);
+        JoinByIpScreen.remember(raw);
+        client.openScreen(new net.minecraft.client.gui.screen.ConnectScreen(this, client,
+                parts[0], Integer.parseInt(parts[1])));
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (quickField != null && quickField.isFocused()
+                && (keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER
+                    || keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_KP_ENTER)) {
+            quickJoin();
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
     @Override
     protected int titleY() {
         return this.height < 320 ? 4 : 14;
@@ -169,6 +211,9 @@ public final class GsMainScreen extends GsBaseScreen {
 
     @Override
     public void tick() {
+        if (quickField != null) {
+            quickField.tick();
+        }
         // Rebuild rows only when something actually changed (invite answered,
         // update check finished) - rebuilding every tick would flicker.
         GsMultiplayerClient mod = mod();

@@ -51,4 +51,36 @@ public final class GuiUtil {
                                    String host, int port) {
         client.openScreen(new ConnectScreen(parent, client, host, port));
     }
+
+    /**
+     * Splits a pasted address into host and port. Accepts "host", "host:port",
+     * and "[ipv6]:port". Unknown ports fall back to {@code fallbackPort}.
+     */
+    public static String[] splitAddress(String raw, int fallbackPort) {
+        String host = raw.trim();
+        int port = fallbackPort;
+        if (host.startsWith("[")) {
+            int close = host.indexOf(']');
+            if (close > 0) {
+                port = parsePortTail(host.substring(close + 1), port);
+                host = host.substring(1, close);
+            }
+        } else {
+            int colon = host.lastIndexOf(':');
+            if (colon > 0) {
+                port = parsePortTail(host.substring(colon + 1), port);
+                host = host.substring(0, colon);
+            }
+        }
+        return new String[]{host, String.valueOf(port)};
+    }
+
+    private static int parsePortTail(String text, int fallback) {
+        try {
+            int value = Integer.parseInt(text.trim());
+            return value > 0 && value <= 65535 ? value : fallback;
+        } catch (NumberFormatException e) {
+            return fallback;
+        }
+    }
 }

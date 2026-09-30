@@ -41,34 +41,23 @@ public final class JoinByIpScreen extends GsBaseScreen {
         if (raw.isEmpty()) {
             return;
         }
-        String host = raw;
-        int port = 25565;
-        // "ip:port", "[ipv6]:port" or a plain host - ConnectScreen wants them apart
-        if (host.startsWith("[")) {
-            int close = host.indexOf(']');
-            if (close > 0) {
-                host = host.substring(1, close);
-                int colon = raw.indexOf(':', close);
-                if (colon > 0) {
-                    port = parsePort(raw.substring(colon + 1), port);
-                }
-            }
-        } else {
-            int colon = host.lastIndexOf(':');
-            if (colon > 0) {
-                port = parsePort(host.substring(colon + 1), port);
-                host = host.substring(0, colon);
-            }
-        }
-        GuiUtil.connectLocal(client, parent, host, port);
+        String[] parts = GuiUtil.splitAddress(raw, 25565);
+        remember(raw);
+        GuiUtil.connectLocal(client, parent, parts[0], Integer.parseInt(parts[1]));
     }
 
-    private static int parsePort(String text, int fallback) {
+    /** Keeps the address at the top of the quick-join history (max 5). */
+    static void remember(String raw) {
         try {
-            int value = Integer.parseInt(text.trim());
-            return value > 0 && value <= 65535 ? value : fallback;
-        } catch (NumberFormatException e) {
-            return fallback;
+            com.gsmultiplayer.config.GsConfig config = com.gsmultiplayer.config.ConfigManager.get();
+            config.recentAddresses.remove(raw);
+            config.recentAddresses.add(0, raw);
+            while (config.recentAddresses.size() > 5) {
+                config.recentAddresses.remove(config.recentAddresses.size() - 1);
+            }
+            com.gsmultiplayer.config.ConfigManager.save();
+        } catch (Exception ignored) {
+            // history is a convenience, never a blocker
         }
     }
 

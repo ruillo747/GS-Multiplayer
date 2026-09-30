@@ -140,6 +140,7 @@ public final class OpenToNetworkScreen extends GsBaseScreen {
             }
             if (publicIp != null) {
                 final String address = summary;
+                this.client.execute(() -> GuiUtil.copy(this.client, address)); // auto-copy like e4mc
                 this.client.execute(() -> {
                     if (this.client != null && this.client.inGameHud != null) {
                         GuiUtil.chat(this.client, "gs.multiplayer.open_net_chat", address);
