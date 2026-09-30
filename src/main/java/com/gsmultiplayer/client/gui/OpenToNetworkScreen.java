@@ -34,6 +34,7 @@ public final class OpenToNetworkScreen extends GsBaseScreen {
 
     private TextFieldWidget portField;
     private CheckboxWidget cheatsBox;
+    private CheckboxWidget unlicensedBox;
     private int modeIndex;
     private State state = State.SETUP;
     private String summary = "";
@@ -61,19 +62,22 @@ public final class OpenToNetworkScreen extends GsBaseScreen {
                     modeIndex = (modeIndex + 1) % MODES.length;
                     b.setMessage(GsText.t("gs.multiplayer.game_mode", modeName(MODES[modeIndex])));
                 }));
-        cheatsBox = addButton(new CheckboxWidget(cx - 100, y + 70, 200, 20,
+        cheatsBox = addButton(new CheckboxWidget(cx - 100, y + 66, 200, 20,
                 GsText.t("gs.multiplayer.cheats"), false));
+        unlicensedBox = addButton(new CheckboxWidget(cx - 100, y + 84, 200, 20,
+                GsText.t("gs.multiplayer.allow_unlicensed"),
+                com.gsmultiplayer.config.ConfigManager.get().connection.allowUnlicensed));
 
-        openButton = addButton(new ButtonWidget(cx - 100, y + 96, 200, 20,
+        openButton = addButton(new ButtonWidget(cx - 100, y + 106, 200, 20,
                 GsText.t("gs.multiplayer.open_net_go"), b -> openNetwork()));
-        copyButton = addButton(new ButtonWidget(cx - 100, y + 122, 200, 20,
+        copyButton = addButton(new ButtonWidget(cx - 100, y + 130, 200, 20,
                 GsText.t("gs.multiplayer.open_net_copy"), b -> {
             GuiUtil.copy(client, summary);
             GuiUtil.toast(client, GsText.t("gs.multiplayer.title"),
                     GsText.t("gs.multiplayer.copied"));
         }));
         copyButton.visible = false;
-        closeButton = addButton(new ButtonWidget(cx - 100, y + 146, 200, 20,
+        closeButton = addButton(new ButtonWidget(cx - 100, y + 154, 200, 20,
                 GsText.t("gs.multiplayer.open_net_close"), b -> closeNetwork()));
         closeButton.visible = false;
         setInitialFocus(portField);
@@ -108,6 +112,7 @@ public final class OpenToNetworkScreen extends GsBaseScreen {
         openButton.active = false;
         final GameMode mode = MODES[modeIndex];
         final boolean cheats = cheatsBox.isChecked();
+        final boolean allowAny = unlicensedBox.isChecked();
         WORKER.execute(() -> {
             boolean published = false;
             try {
@@ -115,21 +120,27 @@ public final class OpenToNetworkScreen extends GsBaseScreen {
             } catch (Exception e) {
                 GsLog.warn("openToLan failed: " + e.getMessage());
             }
+            if (published && allowAny) {
+                try {
+                    server.setOnlineMode(false); // friends without a license can join
+                    GsLog.info("LAN server: online-mode off");
+                } catch (Throwable t) {
+                    GsLog.warn("setOnlineMode failed: " + t.getMessage());
+                }
+            }
             PortMapService.Result mapping = ConfigManager.get().connection.autoPortMap
                     ? PortMapService.get().map(port)
                     : new PortMapService.Result(false, null, -1);
             String publicIp = mapping.ok ? PortMapService.publicIp() : null;
             String localIp = PortMapService.localSiteIp();
 
-            StringBuilder sb = new StringBuilder();
-            if (publicIp != null) {
-                sb.append(publicIp).append(':').append(mapping.externalPort);
-            } else if (localIp != null) {
-                sb.append(localIp).append(':').append(port);
-            }
+            final String pub = publicIp != null ? publicIp + ":" + mapping.externalPort : null;
+            final String lan = localIp != null ? localIp + ":" + port : null;
+            String primary = pub != null ? pub : lan;
+
             synchronized (this) {
-                if (sb.length() > 0) {
-                    summary = sb.toString();
+                if (primary != null) {
+                    summary = primary;
                     method = mapping.ok ? mapping.method : "LAN";
                     state = State.OPEN;
                 } else {
@@ -138,15 +149,23 @@ public final class OpenToNetworkScreen extends GsBaseScreen {
                     state = State.FAILED;
                 }
             }
-            if (publicIp != null) {
-                final String address = summary;
-                this.client.execute(() -> GuiUtil.copy(this.client, address)); // auto-copy like e4mc
-                this.client.execute(() -> {
-                    if (this.client != null && this.client.inGameHud != null) {
-                        GuiUtil.chat(this.client, "gs.multiplayer.open_net_chat", address);
-                    }
-                });
-            }
+            final String copyText = primary;
+            this.client.execute(() -> {
+                if (copyText != null) {
+                    GuiUtil.copy(this.client, copyText); // auto-copy like e4mc
+                }
+            });
+            this.client.execute(() -> {
+                if (this.client == null || this.client.inGameHud == null) {
+                    return;
+                }
+                if (pub != null) {
+                    GuiUtil.chat(this.client, "gs.multiplayer.open_net_chat", pub);
+                }
+                if (lan != null && !lan.equals(pub)) {
+                    GuiUtil.chat(this.client, "gs.multiplayer.open_net_chat_lan", lan);
+                }
+            });
         });
     }
 
@@ -184,25 +203,28 @@ public final class OpenToNetworkScreen extends GsBaseScreen {
                 cx - 100, y + 12, 0x9090B0);
 
         if (state == State.WORKING) {
-            drawCentered(matrices, GsText.t("gs.multiplayer.open_net_working"), cx, y + 170, 0xFFFF55);
+            drawCentered(matrices, GsText.t("gs.multiplayer.open_net_working"), cx, y + 168, 0xFFFF55);
             openButton.active = false;
         } else if (state == State.OPEN) {
-            drawCentered(matrices, GsText.t("gs.multiplayer.open_net_ready", method), cx, y + 170, 0x55FF55);
-            drawCentered(matrices, summary, cx, y + 184, 0x55FFFF);
+            drawCentered(matrices, GsText.t("gs.multiplayer.open_net_ready", method), cx, y + 168, 0x55FF55);
+            drawCentered(matrices, summary, cx, y + 182, 0x55FFFF);
+            if ("LAN".equals(method)) {
+                drawCentered(matrices, GsText.t("gs.multiplayer.open_net_hint"), cx, y + 196, 0x808080);
+            }
             copyButton.visible = true;
             closeButton.visible = true;
             openButton.visible = false;
         } else if (state == State.FAILED) {
-            drawCentered(matrices, GsText.t("gs.multiplayer.open_net_fail"), cx, y + 170, 0xFF5555);
-            if (!summary.isEmpty()) {
-                drawCentered(matrices, summary, cx, y + 184, 0x55FFFF);
-                drawCentered(matrices, GsText.t("gs.multiplayer.open_net_hint"), cx, y + 198, 0x808080);
+            drawCentered(matrices, GsText.t("gs.multiplayer.open_net_fail"), cx, y + 168, 0xFF5555);
+            if (summary != null && !summary.isEmpty()) {
+                drawCentered(matrices, summary, cx, y + 182, 0x55FFFF);
+                drawCentered(matrices, GsText.t("gs.multiplayer.open_net_hint"), cx, y + 196, 0x808080);
             } else {
-                drawCentered(matrices, GsText.t("gs.multiplayer.open_net_hint"), cx, y + 184, 0x808080);
+                drawCentered(matrices, GsText.t("gs.multiplayer.open_net_hint"), cx, y + 182, 0x808080);
             }
             openButton.active = true;
         } else {
-            drawCentered(matrices, GsText.t("gs.multiplayer.open_net_hint"), cx, y + 170, 0x808080);
+            drawCentered(matrices, GsText.t("gs.multiplayer.open_net_hint"), cx, y + 168, 0x808080);
         }
     }
 }

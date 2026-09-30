@@ -109,7 +109,7 @@
   "gs.multiplayer.page": "%s / %s",
   "gs.multiplayer.join_ip_title": "Join by IP",
   "gs.multiplayer.join_ip_hint": "Address (ip or ip:port)",
-  "gs.multiplayer.join_ip_note": "The host sends their address via \"Open to network\"",
+  "gs.multiplayer.join_ip_note": "Paste the address the host sent - the mod is NOT needed on the joining side",
   "gs.multiplayer.join_by_ip": "Join by IP",
   "gs.multiplayer.join_ip_short": "Join by IP address",
   "gs.multiplayer.open_net_title": "Open to network",
@@ -136,5 +136,7 @@
   "gs.multiplayer.default_world_name": "%s's world",
   "gs.multiplayer.diag_online": "online",
   "gs.multiplayer.diag_offline": "offline",
-  "gs.multiplayer.waiting_server": "Waiting for the signaling server..."
+  "gs.multiplayer.waiting_server": "Waiting for the signaling server...",
+  "gs.multiplayer.allow_unlicensed": "Allow friends without a license",
+  "gs.multiplayer.open_net_chat_lan": "§7Address in the same Wi-Fi network: §f%s"
 }

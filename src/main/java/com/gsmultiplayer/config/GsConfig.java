@@ -36,6 +36,9 @@ public class GsConfig {
 
         /** Try to open the LAN port on the router automatically (UPnP/NAT-PMP/PCP). */
         public boolean autoPortMap = true;
+
+        /** Let friends without a licensed Minecraft account join the published world. */
+        public boolean allowUnlicensed = true;
     }
 
     public static class User {

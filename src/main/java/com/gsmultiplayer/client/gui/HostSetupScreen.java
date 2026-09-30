@@ -94,6 +94,13 @@ public final class HostSetupScreen extends GsBaseScreen {
                     GsText.t("gs.multiplayer.title"),
                     GsText.t("gs.multiplayer.lan_warn"));
             GsLog.warn("openToLan returned false; the port may already be in use");
+        } else if (ConfigManager.get().connection.allowUnlicensed) {
+            try {
+                server.setOnlineMode(false); // friends without a license can join
+                GsLog.info("Room LAN server: online-mode off");
+            } catch (Throwable t) {
+                GsLog.warn("setOnlineMode failed: " + t.getMessage());
+            }
         }
         String roomName = nameField.getText().trim();
         if (roomName.isEmpty()) {

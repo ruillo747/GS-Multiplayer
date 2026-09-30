@@ -3,10 +3,15 @@ package com.gsmultiplayer.network.portmap;
 import com.gsmultiplayer.p2p.StunResolver;
 import com.gsmultiplayer.util.GsLog;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.DatagramSocket;
+import java.net.HttpURLConnection;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Tries every router port-forwarding protocol in turn (like Open2Online):
@@ -100,15 +105,37 @@ public final class PortMapService {
         }
     }
 
-    /** Public (reflexive) IP of this connection via STUN; null when offline/blocked. */
+    /**
+     * Public IP of this connection: STUN first (shows the NAT-reflected address),
+     * then plain HTTPS echo services - they work even when UDP is blocked.
+     */
     public static String publicIp() {
         try (DatagramSocket socket = new DatagramSocket()) {
             InetSocketAddress mapped = StunResolver.queryAny(socket, 2000);
-            return mapped == null ? null : mapped.getAddress().getHostAddress();
+            if (mapped != null && !mapped.getAddress().isSiteLocalAddress()) {
+                return mapped.getAddress().getHostAddress();
+            }
         } catch (Exception e) {
-            GsLog.debug("public IP: " + e.getMessage());
-            return null;
+            GsLog.debug("public IP via STUN: " + e.getMessage());
         }
+        for (String service : new String[]{"https://api.ipify.org", "https://checkip.amazonaws.com"}) {
+            try {
+                HttpURLConnection conn = (HttpURLConnection) new URL(service).openConnection();
+                conn.setConnectTimeout(3000);
+                conn.setReadTimeout(3000);
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
+                String ip = reader.readLine();
+                reader.close();
+                if (ip != null && ip.trim().matches("[0-9.]{7,15}")) {
+                    GsLog.info("Public IP via " + service + ": " + ip.trim());
+                    return ip.trim();
+                }
+            } catch (Exception e) {
+                GsLog.debug("public IP via " + service + ": " + e.getMessage());
+            }
+        }
+        return null;
     }
 
     /** Preferred LAN IP of this machine; null when none. */

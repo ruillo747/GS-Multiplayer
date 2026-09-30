@@ -109,7 +109,7 @@
   "gs.multiplayer.page": "%s / %s",
   "gs.multiplayer.join_ip_title": "Подключение по IP",
   "gs.multiplayer.join_ip_hint": "Адрес (ip или ip:порт)",
-  "gs.multiplayer.join_ip_note": "Хост присылает адрес через «Открыть в сеть»",
+  "gs.multiplayer.join_ip_note": "Вставьте адрес от хоста — другу мод не нужен",
   "gs.multiplayer.join_by_ip": "По IP-адресу",
   "gs.multiplayer.join_ip_short": "Подключиться по IP-адресу",
   "gs.multiplayer.open_net_title": "Открыть в сеть",
@@ -136,5 +136,7 @@
   "gs.multiplayer.default_world_name": "Мир %s",
   "gs.multiplayer.diag_online": "онлайн",
   "gs.multiplayer.diag_offline": "оффлайн, переподключение…",
-  "gs.multiplayer.waiting_server": "Ожидаю signaling-сервер..."
+  "gs.multiplayer.waiting_server": "Ожидаю signaling-сервер...",
+  "gs.multiplayer.allow_unlicensed": "Разрешить друзьям без лицензии",
+  "gs.multiplayer.open_net_chat_lan": "§7Адрес в той же Wi-Fi сети: §f%s"
 }
