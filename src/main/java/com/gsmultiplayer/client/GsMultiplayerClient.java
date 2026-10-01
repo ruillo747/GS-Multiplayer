@@ -66,6 +66,6 @@ public final class GsMultiplayerClient implements ClientModInitializer {
 
     public void checkForUpdatesNow() {
         GsConfig config = ConfigManager.get();
-        updates.checkAsync(config.updates.repoOwner, config.updates.repoName, GsMultiplayerMod.VERSION);
+        updates.checkAsync(config.updates.repoOwner, config.updates.repoName, GsMultiplayerMod.VERSION, true);
     }
 }

@@ -36,6 +36,7 @@ public final class UpnpMapper implements PortMapper {
     private volatile String serviceType;
     private int mappedInternal = -1;
     private int mappedExternal = -1;
+    private String mappedProtocol = "TCP";
 
     @Override
     public String name() {
@@ -43,14 +44,15 @@ public final class UpnpMapper implements PortMapper {
     }
 
     @Override
-    public int map(int internalPort, int externalPort) {
+    public int map(int internalPort, int externalPort, String protocol) {
         if (controlUrl == null && !discover()) {
             return -1;
         }
-        int assigned = soapAdd(internalPort, externalPort);
+        int assigned = soapAdd(internalPort, externalPort, protocol);
         if (assigned > 0) {
             mappedInternal = internalPort;
             mappedExternal = assigned;
+            mappedProtocol = protocol;
         }
         return assigned;
     }
@@ -59,7 +61,7 @@ public final class UpnpMapper implements PortMapper {
     public void unmap() {
         if (mappedInternal > 0 && controlUrl != null) {
             try {
-                soapDelete(mappedInternal, mappedExternal);
+                soapDelete(mappedInternal, mappedExternal, mappedProtocol);
             } catch (Exception e) {
                 GsLog.debug("UPnP unmap: " + e.getMessage());
             }
@@ -227,12 +229,12 @@ public final class UpnpMapper implements PortMapper {
 
     // ---------------------------------------------------------------- SOAP
 
-    private int soapAdd(int internalPort, int externalPort) {
+    private int soapAdd(int internalPort, int externalPort, String protocol) {
         String localIp = PortMapService.localSiteIp();
         String body = "<u:AddPortMapping xmlns:u=\"" + serviceType + "\">"
                 + "<NewRemoteHost></NewRemoteHost>"
                 + "<NewExternalPort>" + externalPort + "</NewExternalPort>"
-                + "<NewProtocol>UDP</NewProtocol>"
+                + "<NewProtocol>" + protocol + "</NewProtocol>"
                 + "<NewInternalPort>" + internalPort + "</NewInternalPort>"
                 + "<NewInternalClient>" + localIp + "</NewInternalClient>"
                 + "<NewEnabled>1</NewEnabled>"
@@ -243,7 +245,7 @@ public final class UpnpMapper implements PortMapper {
             String response = soap(body, "AddPortMapping");
             if (response.contains("AddPortMappingResponse")
                     || response.startsWith("HTTP/1.") && response.contains(" 200 ")) {
-                GsLog.info("UPnP: mapped UDP " + externalPort + " -> " + localIp + ":" + internalPort);
+                GsLog.info("UPnP: mapped " + protocol + " " + externalPort + " -> " + localIp + ":" + internalPort);
                 return externalPort;
             }
             GsLog.debug("UPnP add rejected: " + firstLine(response));
@@ -253,11 +255,11 @@ public final class UpnpMapper implements PortMapper {
         return -1;
     }
 
-    private void soapDelete(int internalPort, int externalPort) throws Exception {
+    private void soapDelete(int internalPort, int externalPort, String protocol) throws Exception {
         String body = "<u:DeletePortMapping xmlns:u=\"" + serviceType + "\">"
                 + "<NewRemoteHost></NewRemoteHost>"
                 + "<NewExternalPort>" + externalPort + "</NewExternalPort>"
-                + "<NewProtocol>UDP</NewProtocol>"
+                + "<NewProtocol>" + protocol + "</NewProtocol>"
                 + "</u:DeletePortMapping>";
         soap(body, "DeletePortMapping");
     }

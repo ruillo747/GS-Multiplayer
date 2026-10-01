@@ -61,10 +61,16 @@ public final class PortMapService {
     }
 
     /**
-     * Opens a UDP pinhole for the Minecraft LAN port on the router.
+     * Opens the Minecraft LAN port on the router. The integrated server listens
+     * on TCP, so that is the protocol to forward (UDP would be useless).
      * Tries ports {@code lanPort..lanPort+9} to dodge occupied/forbidden ports.
      */
     public synchronized Result map(int lanPort) {
+        return map(lanPort, "TCP");
+    }
+
+    /** Same as {@link #map(int)} with an explicit protocol ("TCP"/"UDP"). */
+    public synchronized Result map(int lanPort, String protocol) {
         if (isActive()) {
             unmap();
         }
@@ -73,7 +79,7 @@ public final class PortMapService {
             for (int candidate = lanPort; candidate < lanPort + 10; candidate++) {
                 int assigned;
                 try {
-                    assigned = mapper.map(lanPort, candidate);
+                    assigned = mapper.map(lanPort, candidate, protocol);
                 } catch (Exception e) {
                     GsLog.debug(mapper.name() + " failed: " + e.getMessage());
                     break;

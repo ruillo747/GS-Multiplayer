@@ -33,8 +33,21 @@ public final class NatPmpMapper implements PortMapper {
         return pcp ? "PCP" : "NAT-PMP";
     }
 
-    /** Router candidates derived from this machine's site-local addresses. */
+    private static volatile List<InetAddress> cachedCandidates;
+    private static volatile long cachedAt;
+    private static final long CACHE_MS = 60_000;
+
+    /**
+     * Router candidates derived from this machine's site-local addresses.
+     * Cached for a minute and resilient to stacks where interface enumeration
+     * fails (some Android JVMs: ioctl SIOCGIFCONF) - falls back to guessing the
+     * gateway from the route the OS picks towards a public address.
+     */
     static List<InetAddress> gatewayCandidates() {
+        List<InetAddress> cached = cachedCandidates;
+        if (cached != null && System.currentTimeMillis() - cachedAt < CACHE_MS) {
+            return cached;
+        }
         LinkedHashSet<InetAddress> out = new LinkedHashSet<>();
         try {
             for (java.net.NetworkInterface nif : java.util.Collections
@@ -65,21 +78,44 @@ public final class NatPmpMapper implements PortMapper {
                 }
             }
         } catch (Exception e) {
-            GsLog.debug("gateway candidates: " + e.getMessage());
+            GsLog.debug("gateway candidates via interfaces: " + e.getMessage());
         }
-        return new ArrayList<>(out);
+        if (out.isEmpty()) {
+            addRouteBasedCandidate(out);
+        }
+        List<InetAddress> result = new ArrayList<>(out);
+        cachedCandidates = result;
+        cachedAt = System.currentTimeMillis();
+        return result;
     }
 
+    /** Local address of the route towards a public IP -> assume the gateway is x.y.z.1. */
+    private static void addRouteBasedCandidate(LinkedHashSet<InetAddress> out) {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            socket.connect(new InetSocketAddress(InetAddress.getByName("8.8.8.8"), 53));
+            InetAddress local = socket.getLocalAddress();
+            if (local != null && local.isSiteLocalAddress()) {
+                byte[] b = local.getAddress();
+                out.add(InetAddress.getByAddress(new byte[]{b[0], b[1], b[2], 1}));
+            }
+        } catch (Exception e) {
+            GsLog.debug("gateway candidates via route: " + e.getMessage());
+        }
+    }
+
+    private String mappedProtocol = "TCP";
+
     @Override
-    public int map(int internalPort, int externalPort) {
+    public int map(int internalPort, int externalPort, String protocol) {
+        mappedProtocol = protocol;
         for (InetAddress gw : gatewayCandidates()) {
             try {
-                int assigned = request(gw, internalPort, externalPort, 7200);
+                int assigned = request(gw, internalPort, externalPort, 7200, protocol);
                 if (assigned > 0) {
                     gateway = gw;
                     mappedInternal = internalPort;
                     mappedExternal = assigned;
-                    GsLog.info(name() + ": mapped UDP " + assigned + " -> "
+                    GsLog.info(name() + ": mapped " + protocol + " " + assigned + " -> "
                             + gw.getHostAddress() + " route to port " + internalPort);
                     return assigned;
                 }
@@ -94,7 +130,7 @@ public final class NatPmpMapper implements PortMapper {
     public void unmap() {
         if (mappedInternal > 0 && gateway != null) {
             try {
-                request(gateway, mappedInternal, mappedExternal, 0);
+                request(gateway, mappedInternal, mappedExternal, 0, mappedProtocol);
             } catch (Exception e) {
                 GsLog.debug(name() + " unmap: " + e.getMessage());
             }
@@ -104,10 +140,11 @@ public final class NatPmpMapper implements PortMapper {
     }
 
     /** Package-private override for tests. */
-    int request(InetAddress gateway, int internalPort, int externalPort, int lifetimeSec)
-            throws Exception {
-        byte[] request = pcp ? pcpRequest(internalPort, externalPort, lifetimeSec)
-                : natPmpRequest(internalPort, externalPort, lifetimeSec);
+    int request(InetAddress gateway, int internalPort, int externalPort, int lifetimeSec,
+                String protocol) throws Exception {
+        boolean tcp = "TCP".equalsIgnoreCase(protocol);
+        byte[] request = pcp ? pcpRequest(internalPort, externalPort, lifetimeSec, tcp)
+                : natPmpRequest(internalPort, externalPort, lifetimeSec, tcp);
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.setSoTimeout(1500);
             socket.connect(new InetSocketAddress(gateway, PCP_MAP_PORT));
@@ -133,10 +170,10 @@ public final class NatPmpMapper implements PortMapper {
         return -1;
     }
 
-    private static byte[] natPmpRequest(int internalPort, int externalPort, int lifetimeSec) {
+    private static byte[] natPmpRequest(int internalPort, int externalPort, int lifetimeSec, boolean tcp) {
         byte[] req = new byte[12];
         req[0] = 0;   // version
-        req[1] = 1;   // op: map UDP
+        req[1] = tcp ? (byte) 2 : (byte) 1;   // op: map TCP / map UDP
         // reserved[2]
         req[4] = (byte) (internalPort >> 8);
         req[5] = (byte) internalPort;
@@ -149,7 +186,7 @@ public final class NatPmpMapper implements PortMapper {
         return req;
     }
 
-    private byte[] pcpRequest(int internalPort, int externalPort, int lifetimeSec) {
+    private byte[] pcpRequest(int internalPort, int externalPort, int lifetimeSec, boolean tcp) {
         byte[] req = new byte[48];
         req[0] = 2;   // version
         req[1] = 1;   // opcode MAP
@@ -157,7 +194,7 @@ public final class NatPmpMapper implements PortMapper {
         writeInt32(req, 4, lifetimeSec);
         // client address [16] - zero means "derive from source"
         req[20] = 0;  // nonce[12] - zero ok for simple clients
-        req[24] = 17; // protocol UDP
+        req[24] = tcp ? (byte) 6 : (byte) 17; // protocol TCP / UDP
         // reserved[3]
         req[28] = (byte) (internalPort >> 8);
         req[29] = (byte) internalPort;
@@ -183,7 +220,11 @@ public final class NatPmpMapper implements PortMapper {
             }
             return -1;
         }
-        if (len < 16 || resp[0] != 0 || resp[1] != (byte) 0x81) {
+        if (len < 16 || resp[0] != 0) {
+            return null;
+        }
+        int op = resp[1] & 0x7F; // 1 = UDP map, 2 = TCP map
+        if (op != 1 && op != 2) {
             return null;
         }
         int result = ((resp[2] & 0xFF) << 8) | (resp[3] & 0xFF);

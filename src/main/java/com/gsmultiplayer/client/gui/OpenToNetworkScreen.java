@@ -87,8 +87,9 @@ public final class OpenToNetworkScreen extends GsBaseScreen {
     private ButtonWidget copyButton;
     private ButtonWidget closeButton;
 
-    private static net.minecraft.text.Text modeName(GameMode mode) {
-        return GsText.t("selectWorld.gameMode." + mode.getName());
+    private static String modeName(GameMode mode) {
+        // own keys - GsText never resolves vanilla translation keys
+        return GsText.format("gs.multiplayer.mode." + mode.getName());
     }
 
     private void openNetwork() {

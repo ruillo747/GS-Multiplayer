@@ -37,14 +37,27 @@ public final class UpdateChecker {
     }
 
     private static final JsonParser PARSER = new JsonParser();
+    private static final long COOLDOWN_MS = 10 * 60 * 1000L;
 
     private volatile Result result = new Result(Status.IDLE, null, null, null, null);
+    private volatile long lastAttemptAt;
+    private volatile String lastKey = "";
 
     public Result getResult() {
         return result;
     }
 
     public void checkAsync(String repoOwner, String repoName, String currentVersion) {
+        checkAsync(repoOwner, repoName, currentVersion, false);
+    }
+
+    /** @param force true skips the cooldown (Diagnostics button). */
+    public void checkAsync(String repoOwner, String repoName, String currentVersion, boolean force) {
+        long now = System.currentTimeMillis();
+        if (!force && now - lastAttemptAt < COOLDOWN_MS) {
+            return; // a recent attempt already covers this
+        }
+        lastAttemptAt = now;
         if (repoOwner == null || repoName == null
                 || repoOwner.isEmpty() || repoName.isEmpty()
                 || "example".equalsIgnoreCase(repoOwner)) {

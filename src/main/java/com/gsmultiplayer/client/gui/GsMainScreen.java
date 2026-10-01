@@ -106,9 +106,6 @@ public final class GsMainScreen extends GsBaseScreen {
         if (result.status == UpdateChecker.Status.AVAILABLE) {
             drawCentered(matrices, GsText.t("gs.multiplayer.update_available", result.latestVersion),
                     this.width / 2, this.height - 14, 0xFFFF55);
-        } else if (result.status == UpdateChecker.Status.ERROR
-                && !"repo not configured".equals(result.message)) {
-            GsLog.debug("update check: " + result.message);
         }
     }
 
